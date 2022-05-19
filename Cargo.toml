@@ -1,0 +1,16 @@
+[workspace]
+members = [
+    "crates/entity",
+    "crates/migration",
+    "crates/server"
+]
+
+[package]
+name = "lyonkit-api"
+description = "Backend api for the lyonkit project"
+version = "0.1.0"
+authors = ["Léo Coletta <leo.coletta@pm.me>"]
+
+[[bin]]
+name = "lyonkit-api"
+path = "crates/server/src/main.rs"
