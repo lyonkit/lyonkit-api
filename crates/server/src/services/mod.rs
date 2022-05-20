@@ -24,6 +24,15 @@ pub fn api_services() -> Scope<
   >,
 > {
   web::scope("/api")
+    .app_data(web::JsonConfig::default().error_handler(|err, _req| {
+      actix_web::error::InternalError::from_response(
+        "",
+        HttpResponse::BadRequest()
+          .content_type("application/json")
+          .body(format!(r#"{{"code": "JSNER", "message":"{}"}}"#, err)),
+      )
+      .into()
+    }))
     .wrap(ApiKeyMiddlewareFactory::new())
     .service(ping)
     .service(page_service())

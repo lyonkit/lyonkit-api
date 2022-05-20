@@ -1,3 +1,5 @@
+pub mod utils;
+
 use actix_web::{body::BoxBody, http::StatusCode, HttpResponse, ResponseError};
 use serde_json::json;
 use std::fmt::{Debug, Display, Formatter};
@@ -21,6 +23,7 @@ pub enum ApiError {
   ApiKeyInvalid,
   ApiKeyReadOnly,
   DbError,
+  DbDeserializeError,
 }
 
 impl Display for ApiError {
@@ -29,7 +32,7 @@ impl Display for ApiError {
       ApiError::ApiKeyNotProvided => write!(f, "ApiKeyError: API key was not provided"),
       ApiError::ApiKeyInvalid => write!(f, "ApiKeyError: Invalid API key"),
       ApiError::ApiKeyReadOnly => write!(f, "ApiKeyError: This API key is readonly"),
-      ApiError::DbError => write!(f, "Internal Server Error"),
+      ApiError::DbError | ApiError::DbDeserializeError => write!(f, "Internal Server Error"),
     }
   }
 }
@@ -40,7 +43,7 @@ impl ApiErrorTrait for ApiError {
       ApiError::ApiKeyNotProvided => String::from("AKNPV"),
       ApiError::ApiKeyInvalid => String::from("AKINV"),
       ApiError::ApiKeyReadOnly => String::from("AKIRO"),
-      ApiError::DbError => String::from("DBERR"),
+      ApiError::DbError | ApiError::DbDeserializeError => String::from("DBDSE"),
     }
   }
 

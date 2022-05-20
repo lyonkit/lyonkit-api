@@ -1,10 +1,16 @@
-use crate::{errors::ApiError, middlewares::api_key::WriteApiKey, AppState};
+use crate::{
+  errors::{
+    utils::{db_err_into_api_err, try_unwrap_active_value},
+    ApiError,
+  },
+  middlewares::api_key::WriteApiKey,
+  AppState,
+};
 use actix_web::{post, web, Error, HttpResponse};
 use chrono::{DateTime, Utc};
 use entity::page;
 use sea_orm::{entity::*, ActiveValue::Set};
 use serde::{Deserialize, Serialize};
-use tracing::error;
 
 #[derive(Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -15,7 +21,7 @@ pub struct CreatePageInput {
 }
 
 impl CreatePageInput {
-  fn active_model_from_namespace(&self, namespace: String) -> page::ActiveModel {
+  fn active_model_from(&self, namespace: String) -> page::ActiveModel {
     page::ActiveModel {
       namespace: Set(namespace),
       title: Set(self.title.to_owned()),
@@ -38,17 +44,19 @@ pub struct CreatePageOutput {
   updated_at: DateTime<Utc>,
 }
 
-impl CreatePageOutput {
-  fn from_active_model(model: page::ActiveModel) -> Self {
-    Self {
-      id: model.id.unwrap(),
-      namespace: model.namespace.unwrap(),
-      path: model.path.unwrap(),
-      title: model.title.unwrap(),
-      description: model.description.unwrap(),
-      created_at: model.created_at.unwrap(),
-      updated_at: model.updated_at.unwrap(),
-    }
+impl TryFrom<page::ActiveModel> for CreatePageOutput {
+  type Error = ApiError;
+
+  fn try_from(model: page::ActiveModel) -> Result<Self, Self::Error> {
+    Ok(Self {
+      id: try_unwrap_active_value(model.id)?,
+      namespace: try_unwrap_active_value(model.namespace)?,
+      path: try_unwrap_active_value(model.path)?,
+      title: try_unwrap_active_value(model.title)?,
+      description: try_unwrap_active_value(model.description)?,
+      created_at: try_unwrap_active_value(model.created_at)?,
+      updated_at: try_unwrap_active_value(model.updated_at)?,
+    })
   }
 }
 
@@ -60,16 +68,10 @@ pub async fn create_page(
 ) -> Result<HttpResponse, Error> {
   Ok(
     body
-      .active_model_from_namespace(api_key.namespace().into())
+      .active_model_from(api_key.namespace().into())
       .save(&data.conn)
       .await
-      .map(|model| HttpResponse::Ok().json(CreatePageOutput::from_active_model(model)))
-      .map_err(|e| {
-        error!(
-          error_message = format!("{:?}", e).as_str(),
-          "An error occured while saving page"
-        );
-        ApiError::DbError
-      })?,
+      .map_err(db_err_into_api_err)
+      .and_then(|model| Ok(HttpResponse::Ok().json(CreatePageOutput::try_from(model)?)))?,
   )
 }
