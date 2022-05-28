@@ -24,6 +24,7 @@ pub enum ApiError {
   ApiKeyReadOnly,
   DbError,
   DbDeserializeError,
+  NotFound,
 }
 
 impl Display for ApiError {
@@ -33,6 +34,7 @@ impl Display for ApiError {
       ApiError::ApiKeyInvalid => write!(f, "ApiKeyError: Invalid API key"),
       ApiError::ApiKeyReadOnly => write!(f, "ApiKeyError: This API key is readonly"),
       ApiError::DbError | ApiError::DbDeserializeError => write!(f, "Internal Server Error"),
+      ApiError::NotFound => write!(f, "Not found"),
     }
   }
 }
@@ -44,14 +46,15 @@ impl ApiErrorTrait for ApiError {
       ApiError::ApiKeyInvalid => String::from("AKINV"),
       ApiError::ApiKeyReadOnly => String::from("AKIRO"),
       ApiError::DbError | ApiError::DbDeserializeError => String::from("DBDSE"),
+      ApiError::NotFound => String::from("NTFND"),
     }
   }
 
   fn http_code(&self) -> StatusCode {
     match self {
-      ApiError::ApiKeyNotProvided => StatusCode::FORBIDDEN,
-      ApiError::ApiKeyInvalid => StatusCode::FORBIDDEN,
+      ApiError::ApiKeyNotProvided | ApiError::ApiKeyInvalid => StatusCode::FORBIDDEN,
       ApiError::ApiKeyReadOnly => StatusCode::UNAUTHORIZED,
+      ApiError::NotFound => StatusCode::NOT_FOUND,
       _ => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }

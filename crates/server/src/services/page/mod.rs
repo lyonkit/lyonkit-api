@@ -1,8 +1,14 @@
-use crate::services::page::create::create_page;
+use crate::services::page::routes::{create_page, delete_page, get_page, list_pages, update_page};
 use actix_web::{web::scope, Scope};
 
-mod create;
+mod models;
+mod routes;
 
 pub fn page_service() -> Scope {
-  scope("/page").service(create_page)
+  scope("/page")
+    .service(list_pages)
+    .service(get_page)
+    .service(create_page)
+    .service(update_page)
+    .service(delete_page)
 }

@@ -15,10 +15,9 @@ use tracing::{error, warn};
 use uuid::Uuid;
 
 #[derive(Getters, Clone)]
+#[getset(get = "pub")]
 pub struct ApiKey {
-  #[get = "pub"]
   namespace: String,
-  #[get = "pub"]
   read_only: bool,
 }
 
@@ -66,8 +65,8 @@ impl FromRequest for ApiKey {
 }
 
 #[derive(Getters, Clone)]
+#[getset(get = "pub")]
 pub struct WriteApiKey {
-  #[get = "pub"]
   namespace: String,
 }
 
