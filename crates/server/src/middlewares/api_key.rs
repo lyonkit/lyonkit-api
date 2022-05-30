@@ -1,4 +1,4 @@
-use crate::{errors::ApiError, AppState};
+use crate::{errors::ApiError, server::AppState};
 use actix_web::{
   dev::{forward_ready, Payload, Service, ServiceRequest, ServiceResponse, Transform},
   web, Error as ActixError, FromRequest, HttpMessage, HttpRequest,
@@ -157,7 +157,7 @@ where
         if let Ok(uuid) = api_key_uuid {
           let api_key_entiy = api_key::Entity::find()
             .filter(api_key::Column::Key.eq(uuid))
-            .one(&app_data.conn)
+            .one(app_data.conn())
             .await
             .inspect_err(|db_err| {
               error!(

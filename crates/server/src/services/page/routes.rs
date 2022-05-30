@@ -1,8 +1,8 @@
 pub use crate::{
   errors::{utils::db_err_into_api_err, ApiError},
   middlewares::api_key::WriteApiKey,
+  server::AppState,
   services::page::models::{PageInput, PageOutput},
-  AppState,
 };
 use actix_web::{delete, get, post, put, web, Error as ActixError, HttpResponse};
 use entity::page::{Column, Entity, Model};
@@ -15,7 +15,7 @@ pub async fn list_pages(
 ) -> Result<HttpResponse, ActixError> {
   let pages: Vec<Model> = Entity::find()
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
-    .all(&data.conn)
+    .all(data.conn())
     .await
     .map_err(db_err_into_api_err)?;
 
@@ -40,7 +40,7 @@ pub async fn get_page(
   let page: Model = Entity::find()
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
     .filter(Column::Id.eq(id))
-    .one(&data.conn)
+    .one(data.conn())
     .await
     .map_err(db_err_into_api_err)?
     .ok_or(ApiError::NotFound)?;
@@ -59,7 +59,7 @@ pub async fn create_page(
 
   Ok(
     model
-      .save(&data.conn)
+      .save(data.conn())
       .await
       .map_err(db_err_into_api_err)
       .and_then(|model| Ok(HttpResponse::Ok().json(PageOutput::try_from(model)?)))?,
@@ -79,7 +79,7 @@ pub async fn update_page(
   Entity::find()
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
     .filter(Column::Id.eq(id))
-    .one(&data.conn)
+    .one(data.conn())
     .await
     .map_err(db_err_into_api_err)?
     .ok_or(ApiError::NotFound)?;
@@ -90,7 +90,7 @@ pub async fn update_page(
 
   Ok(
     model
-      .save(&data.conn)
+      .save(data.conn())
       .await
       .map_err(db_err_into_api_err)
       .and_then(|model| Ok(HttpResponse::Ok().json(PageOutput::try_from(model)?)))?,
@@ -108,14 +108,14 @@ pub async fn delete_page(
   let page: Model = Entity::find()
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
     .filter(Column::Id.eq(id))
-    .one(&data.conn)
+    .one(data.conn())
     .await
     .map_err(db_err_into_api_err)?
     .ok_or(ApiError::NotFound)?;
 
   page
     .clone()
-    .delete(&data.conn)
+    .delete(data.conn())
     .await
     .map_err(db_err_into_api_err)?;
 
