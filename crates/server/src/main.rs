@@ -15,6 +15,8 @@ use std::io;
 async fn main() -> io::Result<()> {
   init_tracing();
 
+  dbg!((*SETTINGS).clone());
+
   Server::from_settings((*SETTINGS).clone())
     .await
     .run_until_stopped()
