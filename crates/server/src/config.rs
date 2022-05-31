@@ -1,17 +1,19 @@
 use ::serde::Deserialize;
 use config::Environment;
 pub use config::{Config, ConfigError};
+use derive_more::Constructor;
 use getset::Getters;
 use std::lazy::SyncLazy;
+use url::Url;
 
-#[derive(Deserialize, Getters, Clone)]
+#[derive(Deserialize, Getters, Constructor, Clone, Debug)]
 #[getset(get = "pub")]
 pub struct Settings {
   app_name: String,
+  host: String,
+  port: String,
   database_url: String,
   telemetry: bool,
-  port: String,
-  host: String,
 }
 
 impl Settings {
@@ -30,6 +32,21 @@ impl Settings {
 
   pub fn server_addr(&self) -> String {
     format!("{host}:{port}", host = self.host, port = self.port)
+  }
+
+  pub fn database_url_without_db(&self) -> String {
+    let mut parsed_url =
+      Url::parse(self.database_url().as_str()).expect("Invalid database url (cannot parse)");
+
+    parsed_url.set_path("");
+    parsed_url.to_string()
+  }
+
+  pub fn database_name(&self) -> String {
+    let mut parsed_url =
+      Url::parse(self.database_url().as_str()).expect("Invalid database url (cannot parse)");
+
+    parsed_url.path().replace("/", "")
   }
 }
 
