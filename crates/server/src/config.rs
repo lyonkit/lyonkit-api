@@ -1,14 +1,17 @@
 use ::serde::Deserialize;
 use config::Environment;
 pub use config::{Config, ConfigError};
+use getset::Getters;
 use std::lazy::SyncLazy;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Getters, Clone)]
+#[getset(get = "pub")]
 pub struct Settings {
-  pub app_name: String,
-  pub database_url: String,
-  pub port: String,
-  pub host: String,
+  app_name: String,
+  database_url: String,
+  telemetry: bool,
+  port: String,
+  host: String,
 }
 
 impl Settings {
@@ -17,7 +20,8 @@ impl Settings {
       .set_default("app_name", "lyonkit-api")?
       .set_default("port", 8080)?
       .set_default("host", "0.0.0.0")?
-      .add_source(Environment::default().separator(".").list_separator(","))
+      .set_default("telemetry", false)?
+      .add_source(Environment::default().separator("__").list_separator(","))
       .build()
       .unwrap();
 

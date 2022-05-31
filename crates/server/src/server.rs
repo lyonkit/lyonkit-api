@@ -1,9 +1,9 @@
-use crate::services::api_services;
+use crate::{config::Settings, services::api_services};
 use actix_web::{web, App, HttpServer};
 use derive_more::Constructor;
 use getset::Getters;
 use sea_orm::DatabaseConnection;
-use tracing_actix_web::{RootSpanBuilder, TracingLogger};
+use tracing_actix_web::{DefaultRootSpanBuilder, RootSpanBuilder, TracingLogger};
 
 #[derive(Clone, Getters, Constructor)]
 #[getset(get = "pub")]
@@ -19,7 +19,21 @@ pub struct AppState {
   conn: DatabaseConnection,
 }
 
-impl<RootSpan: RootSpanBuilder + std::marker::Send + 'static> Server<RootSpan> {
+impl Server<DefaultRootSpanBuilder> {
+  pub async fn from_settings(settings: Settings) -> Self {
+    Self::new(
+      settings.server_addr(),
+      sea_orm::Database::connect(settings.database_url())
+        .await
+        .expect(
+          "Failed to connect to the database, please ensure the given env DATABASE_URL is valid !",
+        ),
+      TracingLogger::default(),
+    )
+  }
+}
+
+impl<RootSpan: RootSpanBuilder + Send + 'static> Server<RootSpan> {
   pub async fn run_until_stopped(self) -> std::io::Result<()> {
     let app_state = AppState {
       conn: self.database_connection,
