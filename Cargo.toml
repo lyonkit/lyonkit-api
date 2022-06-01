@@ -10,6 +10,7 @@ name = "lyonkit-api"
 description = "Backend api for the lyonkit project"
 version = "0.1.0"
 authors = ["Léo Coletta <leo.coletta@pm.me>"]
+edition = "2021"
 
 [[bin]]
 name = "lyonkit-api"

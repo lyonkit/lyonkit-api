@@ -34,6 +34,7 @@ impl Settings {
     format!("{host}:{port}", host = self.host, port = self.port)
   }
 
+  #[allow(unused)]
   pub fn database_url_without_db(&self) -> String {
     let mut parsed_url =
       Url::parse(self.database_url().as_str()).expect("Invalid database url (cannot parse)");
@@ -42,8 +43,9 @@ impl Settings {
     parsed_url.to_string()
   }
 
+  #[allow(unused)]
   pub fn database_name(&self) -> String {
-    let mut parsed_url =
+    let parsed_url =
       Url::parse(self.database_url().as_str()).expect("Invalid database url (cannot parse)");
 
     parsed_url.path().replace("/", "")

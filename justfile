@@ -8,3 +8,6 @@ run:
 
 dev:
     npm i -g bunyan && cargo-watch -C crates/server -s 'cargo run | bunyan'
+
+test:
+    cargo test -p server

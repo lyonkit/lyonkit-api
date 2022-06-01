@@ -17,6 +17,8 @@ impl MigrationTrait for Migration {
     create_table_from_entity!(manager, Entity)?;
 
     // Set default value for created_at / updated_at columns
+    exec_stmt!(manager, r#"create extension if not exists "uuid-ossp""#)?;
+
     exec_stmt!(
       manager,
       r#"alter table api_keys 

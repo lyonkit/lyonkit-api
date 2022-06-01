@@ -30,7 +30,7 @@ impl MigrationTrait for Migration {
     exec_stmt!(
       manager,
       r#"
-        create function tg__timestamps() returns trigger as $$
+        create or replace function tg__timestamps() returns trigger as $$
           begin
             NEW.created_at = (case when TG_OP = 'INSERT' then NOW() else OLD.created_at end);
             NEW.updated_at = (case when TG_OP = 'UPDATE' and OLD.updated_at >= NOW() then OLD.updated_at + interval '1 millisecond' else NOW() end);

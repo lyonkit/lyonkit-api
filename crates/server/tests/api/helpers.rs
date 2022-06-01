@@ -1,51 +1,87 @@
 use getset::Getters;
 use migration::{Migrator, MigratorTrait};
-use opentelemetry::trace::SpanKind::Server;
 use portpicker::pick_unused_port;
-use sea_orm::{ColumnType::Uuid, ConnectionTrait, DatabaseConnection};
+use sea_orm::{ConnectionTrait, DatabaseConnection};
 use serde::Serialize;
 use server::{
-  config::{Settings, SETTINGS},
+  config::Settings,
   server::Server,
   telemetry::{get_subscriber, init_subscriber},
 };
-use std::{env::VarError, lazy::SyncLazy};
+use std::lazy::SyncLazy;
 use url::Url;
 
 static TRACING: SyncLazy<()> = SyncLazy::new(|| {
   let default_filter_level = "info".to_string();
   let subscriber_name = "test".to_string();
-  let subscriber = match std::env::var("TEST_LOG") {
-    Ok(_) => get_subscriber(
-      subscriber_name,
-      default_filter_level,
-      false,
-      std::io::stdout,
-    ),
-    Err(_) => get_subscriber(subscriber_name, default_filter_level, false, std::io::sink),
+  match std::env::var("TEST_LOG") {
+    Ok(_) => {
+      init_subscriber(get_subscriber(
+        subscriber_name,
+        default_filter_level,
+        false,
+        std::io::stdout,
+      ));
+    }
+    Err(_) => {
+      init_subscriber(get_subscriber(
+        subscriber_name,
+        default_filter_level,
+        false,
+        std::io::sink,
+      ));
+    }
   };
-
-  init_subscriber(subscriber);
 });
 
 #[derive(Getters)]
 #[getset(get = "pub")]
 pub struct TestApp {
   address: String,
+  #[allow(unused)]
   port: u16,
+  #[allow(unused)]
   database_connection: DatabaseConnection,
+  settings: Settings,
   http_client: reqwest::Client,
 }
 
 impl TestApp {
-  pub async fn post<T: Serialize>(&self, uri: string, body: T) -> reqwest::Response {
+  pub async fn get<S: AsRef<str>>(&self, uri: S) -> reqwest::Response {
     self
       .http_client
-      .post(&format!("{}/api{}", self.address(), uri))
-      .json(body)
+      .get(&format!("http://{}/api{}", self.address(), uri.as_ref()))
       .send()
       .await
       .expect("Failed to execute request")
+  }
+
+  #[allow(unused)]
+  pub async fn post<T: Serialize, S: AsRef<str>>(&self, uri: S, body: T) -> reqwest::Response {
+    self
+      .http_client
+      .post(&format!("http://{}/api{}", self.address(), uri.as_ref()))
+      .json(&body)
+      .send()
+      .await
+      .expect("Failed to execute request")
+  }
+
+  pub async fn teardown(&self) {
+    let conn = sea_orm::Database::connect(self.settings().database_url_without_db())
+      .await
+      .expect("Failed to connect to database");
+
+    conn
+      .execute(sea_orm::Statement::from_string(
+        conn.get_database_backend(),
+        format!(
+          r#"DROP DATABASE IF EXISTS "{db}" WITH (FORCE)"#,
+          db = self.settings().database_name()
+        ),
+      ))
+      .await
+      .expect("Failed to drop database");
   }
 }
 
@@ -87,7 +123,7 @@ async fn configure_database(settings: &Settings) -> DatabaseConnection {
 pub async fn spawn_app() -> TestApp {
   SyncLazy::force(&TRACING);
 
-  let test_db_name = "__lyonkit_api_test";
+  let test_db_name = uuid::Uuid::new_v4().to_string();
 
   let database_url = {
     let url = std::env::var("DATABASE_URL").expect("No database url specified");
@@ -100,14 +136,19 @@ pub async fn spawn_app() -> TestApp {
   let settings = Settings::new(
     String::from("test"),
     String::from("0.0.0.0"),
-    port,
+    port.to_string(),
     database_url,
     false,
   );
 
   let database_connection = configure_database(&settings).await;
 
-  let server = Server::from_settings(settings).await;
+  let server = Server::from_settings(&settings)
+    .await
+    .build()
+    .expect("Failed to start server");
+
+  let address = server.server_addr().clone();
 
   let _server_process = tokio::spawn(server.run_until_stopped());
 
@@ -119,8 +160,9 @@ pub async fn spawn_app() -> TestApp {
 
   TestApp {
     http_client,
-    address: server.server_addr().clone(),
+    address,
     port,
     database_connection,
+    settings,
   }
 }
