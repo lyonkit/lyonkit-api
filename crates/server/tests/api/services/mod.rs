@@ -1,1 +1,2 @@
 mod ping;
+mod page;
