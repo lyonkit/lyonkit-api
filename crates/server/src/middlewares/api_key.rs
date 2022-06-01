@@ -103,6 +103,7 @@ impl From<api_key::Model> for WriteApiKey {
   }
 }
 
+#[derive(Default)]
 pub struct ApiKeyMiddlewareFactory;
 
 impl ApiKeyMiddlewareFactory {
