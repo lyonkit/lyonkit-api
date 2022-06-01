@@ -2382,11 +2382,12 @@ name = "server"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "async-trait",
  "chrono",
  "config",
  "derive_more",
  "entity",
- "futures-util",
+ "futures",
  "getset",
  "migration",
  "opentelemetry",
@@ -2396,6 +2397,7 @@ dependencies = [
  "sea-orm",
  "serde",
  "serde_json",
+ "test-context",
  "tokio",
  "tracing",
  "tracing-actix-web",
@@ -2706,6 +2708,27 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
+]
+
+[[package]]
+name = "test-context"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d813064aec716c2ed0e46f10c1e11143c8a73d394ec139d85487cf9c7c0abfa3"
+dependencies = [
+ "async-trait",
+ "futures",
+ "test-context-macros",
+]
+
+[[package]]
+name = "test-context-macros"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f5c0709159d0fc65bd87254492efb5f53b84424321c4b4d316fe8508628fa5e"
+dependencies = [
+ "quote",
+ "syn",
 ]
 
 [[package]]
