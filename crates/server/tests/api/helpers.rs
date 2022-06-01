@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use getset::Getters;
 use migration::{Migrator, MigratorTrait};
 use portpicker::pick_unused_port;
@@ -10,6 +11,7 @@ use server::{
   telemetry::{get_subscriber, init_subscriber},
 };
 use std::lazy::SyncLazy;
+use test_context::AsyncTestContext;
 use url::Url;
 
 static TRACING: SyncLazy<()> = SyncLazy::new(|| {
@@ -35,7 +37,7 @@ static TRACING: SyncLazy<()> = SyncLazy::new(|| {
   };
 });
 
-#[derive(Getters)]
+#[derive(Getters, Clone)]
 #[getset(get = "pub")]
 pub struct TestApp {
   address: String,
@@ -100,7 +102,7 @@ impl TestApp {
     api_key
   }
 
-  pub async fn teardown(&self) {
+  pub async fn terminate(&self) {
     let conn = sea_orm::Database::connect(self.settings().database_url_without_db())
       .await
       .expect("Failed to connect to database");
@@ -198,5 +200,16 @@ pub async fn spawn_app() -> TestApp {
     database_connection,
     settings,
     active_api_key: None,
+  }
+}
+
+#[async_trait]
+impl AsyncTestContext for TestApp {
+  async fn setup() -> Self {
+    spawn_app().await
+  }
+
+  async fn teardown(self) {
+    self.terminate().await
   }
 }

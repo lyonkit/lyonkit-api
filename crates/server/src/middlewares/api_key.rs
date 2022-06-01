@@ -4,7 +4,7 @@ use actix_web::{
   web, Error as ActixError, FromRequest, HttpMessage, HttpRequest,
 };
 use entity::api_key;
-use futures_util::{future::LocalBoxFuture, FutureExt};
+use futures::{future::LocalBoxFuture, FutureExt};
 use getset::Getters;
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 use std::{

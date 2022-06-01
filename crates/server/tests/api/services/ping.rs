@@ -16,5 +16,5 @@ async fn ping_works() {
       .and_then(|v| v.to_str().ok())
   );
 
-  app.teardown().await;
+  app.terminate().await;
 }

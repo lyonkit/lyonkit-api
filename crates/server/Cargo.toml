@@ -29,13 +29,15 @@ sea-orm = { version = "0.8.0", features = ["debug-print", "runtime-tokio-rustls"
 config = { version = "0.13.1" }
 serde_json = "1.0.81"
 chrono = "0.4.19"
-futures-util = "0.3.21"
+futures = "0.3.21"
 getset = "0.1.2"
 uuid = { version = "0.8.2", features = ["serde"] }
 derive_more = "0.99.17"
 url = "2.2.2"
+async-trait = "0.1.53"
 
 [dev-dependencies]
 migration = { path = "../migration" }
 portpicker = "0.1.1"
 reqwest = { version = "0.11.10", features = ["__rustls", "json", "cookies"], default-features = false }
+test-context = "0.1.3"
