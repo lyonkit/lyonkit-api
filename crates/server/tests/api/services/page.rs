@@ -1,4 +1,5 @@
 use crate::helpers::TestApp;
+use reqwest::StatusCode;
 use serde_json::{json, Map, Value};
 use std::collections::HashSet;
 use test_context::test_context;
@@ -56,4 +57,62 @@ async fn create_valid_page_should_work(ctx: &mut TestApp) {
       "create_get_and_delete_page_should_work".to_string()
     ))
   );
+}
+
+#[test_context(TestApp)]
+#[tokio::test]
+async fn create_page_with_invalid_api_key_should_be_denied(ctx: &mut TestApp) {
+  let response = ctx
+    .post(
+      "/page",
+      json!({
+        "path": "/no-api-key",
+        "title": "A page created with no API KEY !",
+        "description": "This is an example of page created with no API KEY !"
+      }),
+    )
+    .await;
+  assert_eq!(StatusCode::FORBIDDEN, response.status());
+  let json = response
+    .json::<Value>()
+    .await
+    .expect("Failed to deserialize body");
+  assert_eq!(Some(&Value::String("AKNPV".to_string())), json.get("code"));
+
+  ctx.create_api_key("create_page_read_only_key", true).await;
+
+  let response = ctx
+    .post(
+      "/page",
+      json!({
+        "path": "/read-only-api",
+        "title": "A page created with RO API KEY !",
+        "description": "This is an example of page created with RO API KEY !"
+      }),
+    )
+    .await;
+  assert_eq!(StatusCode::UNAUTHORIZED, response.status());
+  let json = response
+    .json::<Value>()
+    .await
+    .expect("Failed to deserialize body");
+  assert_eq!(Some(&Value::String("AKIRO".to_string())), json.get("code"));
+
+  ctx.set_active_api_key(Some(String::from("MY_CUSTOM_INVALID_API_KEY")));
+  let response = ctx
+    .post(
+      "/page",
+      json!({
+        "path": "/invalid-api-key",
+        "title": "A page created with invalid API KEY !",
+        "description": "This is an example of page created with invalid API KEY !"
+      }),
+    )
+    .await;
+  assert_eq!(StatusCode::FORBIDDEN, response.status());
+  let json = response
+    .json::<Value>()
+    .await
+    .expect("Failed to deserialize body");
+  assert_eq!(Some(&Value::String("AKINV".to_string())), json.get("code"));
 }

@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use getset::Getters;
+use getset::{Getters, Setters};
 use migration::{Migrator, MigratorTrait};
 use portpicker::pick_unused_port;
 use reqwest::Method;
@@ -37,7 +37,7 @@ static TRACING: SyncLazy<()> = SyncLazy::new(|| {
   };
 });
 
-#[derive(Getters, Clone)]
+#[derive(Getters, Setters, Clone)]
 #[getset(get = "pub")]
 pub struct TestApp {
   address: String,
@@ -47,6 +47,7 @@ pub struct TestApp {
   database_connection: DatabaseConnection,
   settings: Settings,
   http_client: reqwest::Client,
+  #[getset(set = "pub")]
   active_api_key: Option<String>,
 }
 
