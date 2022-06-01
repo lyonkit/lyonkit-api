@@ -1,7 +1,8 @@
 use getset::Getters;
 use migration::{Migrator, MigratorTrait};
 use portpicker::pick_unused_port;
-use sea_orm::{ConnectionTrait, DatabaseConnection};
+use reqwest::Method;
+use sea_orm::{ActiveModelTrait, ActiveValue, ConnectionTrait, DatabaseConnection};
 use serde::Serialize;
 use server::{
   config::Settings,
@@ -44,27 +45,59 @@ pub struct TestApp {
   database_connection: DatabaseConnection,
   settings: Settings,
   http_client: reqwest::Client,
+  active_api_key: Option<String>,
 }
 
 impl TestApp {
-  pub async fn get<S: AsRef<str>>(&self, uri: S) -> reqwest::Response {
-    self
+  pub async fn req<U: AsRef<str>, T: Serialize>(
+    &self,
+    method: Method,
+    uri: U,
+    body: Option<T>,
+  ) -> reqwest::Response {
+    let mut request = self
       .http_client
-      .get(&format!("http://{}/api{}", self.address(), uri.as_ref()))
-      .send()
-      .await
-      .expect("Failed to execute request")
+      .request(
+        method,
+        &format!("http://{}/api{}", self.address(), uri.as_ref()),
+      )
+      .header("Content-Type", "application/json");
+
+    if let Some(api_key) = &self.active_api_key {
+      request = request.header("X-Api-Key", api_key);
+    }
+
+    if let Some(payload) = &body {
+      request = request.json(payload);
+    }
+
+    request.send().await.expect("Failed to execute request")
   }
 
-  #[allow(unused)]
+  pub async fn get<S: AsRef<str>>(&self, uri: S) -> reqwest::Response {
+    self.req(Method::GET, uri, None as Option<()>).await
+  }
+
   pub async fn post<T: Serialize, S: AsRef<str>>(&self, uri: S, body: T) -> reqwest::Response {
-    self
-      .http_client
-      .post(&format!("http://{}/api{}", self.address(), uri.as_ref()))
-      .json(&body)
-      .send()
+    self.req(Method::POST, uri, Some(body)).await
+  }
+
+  pub async fn create_api_key(
+    &mut self,
+    namespace: &str,
+    read_only: bool,
+  ) -> entity::api_key::Model {
+    let api_key = entity::api_key::ActiveModel {
+      namespace: ActiveValue::set(namespace.to_owned()),
+      read_only: ActiveValue::set(read_only),
+      ..Default::default()
+    };
+    let api_key: entity::api_key::Model = api_key
+      .insert(self.database_connection())
       .await
-      .expect("Failed to execute request")
+      .expect("Failed to create API key");
+    self.active_api_key = Some(api_key.key.to_string());
+    api_key
   }
 
   pub async fn teardown(&self) {
@@ -164,5 +197,6 @@ pub async fn spawn_app() -> TestApp {
     port,
     database_connection,
     settings,
+    active_api_key: None,
   }
 }
