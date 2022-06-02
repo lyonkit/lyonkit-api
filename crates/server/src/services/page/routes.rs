@@ -1,3 +1,4 @@
+use crate::middlewares::api_key::ApiKey;
 pub use crate::{
   errors::{utils::db_err_into_api_err, ApiError},
   middlewares::api_key::WriteApiKey,
@@ -11,7 +12,7 @@ use sea_orm::{prelude::*, ActiveValue::Set};
 #[get("")]
 pub async fn list_pages(
   data: web::Data<AppState>,
-  api_key: WriteApiKey,
+  api_key: ApiKey,
 ) -> Result<HttpResponse, ActixError> {
   let pages: Vec<Model> = Entity::find()
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
@@ -23,7 +24,7 @@ pub async fn list_pages(
     HttpResponse::Ok().json(
       pages
         .into_iter()
-        .map(|page| PageOutput::from(page))
+        .map(PageOutput::from)
         .collect::<Vec<PageOutput>>(),
     ),
   )
@@ -33,7 +34,7 @@ pub async fn list_pages(
 pub async fn get_page(
   data: web::Data<AppState>,
   path_id: web::Path<i32>,
-  api_key: WriteApiKey,
+  api_key: ApiKey,
 ) -> Result<HttpResponse, ActixError> {
   let id = path_id.into_inner();
 

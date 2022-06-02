@@ -4,7 +4,7 @@ use serde_json::{json, Map, Value};
 use std::collections::HashSet;
 use test_context::test_context;
 
-async fn create_page(app: &TestApp, body: &Value) -> Map<String, Value> {
+pub async fn create_page(app: &TestApp, body: &Value) -> Map<String, Value> {
   let response = app.post("/page", body).await;
   assert!(response.status().is_success());
 
