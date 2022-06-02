@@ -85,6 +85,10 @@ impl TestApp {
     self.req(Method::POST, uri, Some(body)).await
   }
 
+  pub async fn delete<S: AsRef<str>>(&self, uri: S) -> reqwest::Response {
+    self.req(Method::DELETE, uri, None as Option<()>).await
+  }
+
   pub async fn create_api_key(
     &mut self,
     namespace: &str,
