@@ -61,6 +61,39 @@ async fn create_valid_page_should_work(ctx: &mut TestApp) {
 
 #[test_context(TestApp)]
 #[tokio::test]
+async fn create_page_cannot_have_duplicate_path(ctx: &mut TestApp) {
+  ctx.create_api_key("write_api_key", false).await;
+
+  create_page(
+    ctx,
+    &json!({
+        "path": "/my-path",
+        "title": "First title !",
+        "description": "First description !"
+    }),
+  )
+  .await;
+  let response = ctx
+    .post(
+      "/page",
+      json!({
+        "path": "/my-path",
+        "title": "Second title !",
+        "description": "Second description"
+      }),
+    )
+    .await;
+
+  assert_eq!(StatusCode::INTERNAL_SERVER_ERROR, response.status());
+  let json = response
+    .json::<Value>()
+    .await
+    .expect("Failed to deserialize body");
+  assert_eq!(Some(&Value::String("DBERR".to_string())), json.get("code"));
+}
+
+#[test_context(TestApp)]
+#[tokio::test]
 async fn create_page_with_invalid_api_key_should_be_denied(ctx: &mut TestApp) {
   let response = ctx
     .post(

@@ -45,7 +45,8 @@ impl ApiErrorTrait for ApiError {
       ApiError::ApiKeyNotProvided => String::from("AKNPV"),
       ApiError::ApiKeyInvalid => String::from("AKINV"),
       ApiError::ApiKeyReadOnly => String::from("AKIRO"),
-      ApiError::DbError | ApiError::DbDeserializeError => String::from("DBDSE"),
+      ApiError::DbError => String::from("DBERR"),
+      ApiError::DbDeserializeError => String::from("DBDSE"),
       ApiError::NotFound => String::from("NTFND"),
     }
   }
