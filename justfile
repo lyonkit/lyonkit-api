@@ -11,3 +11,12 @@ dev:
 
 test:
     cargo test -p server
+
+server script *args:
+    cargo {{script}} -p server {{args}}
+
+lint:
+    cargo clippy
+
+lintfix:
+    cargo clippy --fix

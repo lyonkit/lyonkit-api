@@ -1,4 +1,4 @@
-use ::serde::Deserialize;
+use serde::Deserialize;
 use config::Environment;
 pub use config::{Config, ConfigError};
 use derive_more::Constructor;
