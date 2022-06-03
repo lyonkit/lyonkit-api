@@ -160,11 +160,12 @@ where
             .filter(api_key::Column::Key.eq(uuid))
             .one(app_data.conn())
             .await
-            .inspect_err(|db_err| {
+            .map_err(|db_err| {
               error!(
                 error_message = format!("{:?}", db_err).as_str(),
                 "An error occured while querying api key"
-              )
+              );
+              db_err
             })
             .ok()
             .flatten();

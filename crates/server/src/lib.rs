@@ -1,6 +1,3 @@
-#![feature(once_cell)]
-#![feature(result_option_inspect)]
-
 pub mod config;
 pub mod errors;
 pub mod middlewares;

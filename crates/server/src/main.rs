@@ -1,6 +1,3 @@
-#![feature(once_cell)]
-#![feature(result_option_inspect)]
-
 mod config;
 mod errors;
 mod middlewares;

@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use getset::{Getters, Setters};
 use migration::{Migrator, MigratorTrait};
+use once_cell::sync::Lazy as SyncLazy;
 use portpicker::pick_unused_port;
 use reqwest::Method;
 use sea_orm::{ActiveModelTrait, ActiveValue, ConnectionTrait, DatabaseConnection};
@@ -10,7 +11,6 @@ use server::{
   server::Server,
   telemetry::{get_subscriber, init_subscriber},
 };
-use std::lazy::SyncLazy;
 use test_context::AsyncTestContext;
 use url::Url;
 

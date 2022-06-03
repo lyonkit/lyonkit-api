@@ -2390,6 +2390,7 @@ dependencies = [
  "futures",
  "getset",
  "migration",
+ "once_cell",
  "opentelemetry",
  "opentelemetry-jaeger",
  "portpicker",

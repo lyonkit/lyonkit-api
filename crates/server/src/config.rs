@@ -1,9 +1,9 @@
-use serde::Deserialize;
 use config::Environment;
 pub use config::{Config, ConfigError};
 use derive_more::Constructor;
 use getset::Getters;
-use std::lazy::SyncLazy;
+use once_cell::sync::Lazy as SyncLazy;
+use serde::Deserialize;
 use url::Url;
 
 #[derive(Deserialize, Getters, Constructor, Clone, Debug)]
