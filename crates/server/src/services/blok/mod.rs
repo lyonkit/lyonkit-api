@@ -1,4 +1,4 @@
-use crate::services::blok::routes::{create_blok, get_blok, update_blok};
+use crate::services::blok::routes::{create_blok, delete_blok, get_blok, update_blok};
 use actix_web::{web::scope, Scope};
 
 mod models;
@@ -9,4 +9,5 @@ pub fn blok_service() -> Scope {
     .service(get_blok)
     .service(create_blok)
     .service(update_blok)
+    .service(delete_blok)
 }
