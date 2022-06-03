@@ -10,7 +10,7 @@ on:
       - main
 
 env:
-  DATABASE_URL: postgresql://root:root@localhost:5432/anais_coletta_coaching
+  DATABASE_URL: postgresql://postgres:root@localhost:5432/test
   RUST_LOG: debug
   TEST_LOG: true
 
@@ -30,9 +30,9 @@ jobs:
       postgres:
         image: postgres:13.6
         env:
-          POSTGRES_USER: root
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: root
-          POSTGRES_DB: anais_coletta_coaching
+          POSTGRES_DB: test
         ports:
           - 5432:5432
         # Set health checks to wait until postgres has started
@@ -47,6 +47,9 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
+          override: true
+          profile: minimal
       - uses: actions-rs/cargo@v1
         with:
           command: test
+          args: -p server
