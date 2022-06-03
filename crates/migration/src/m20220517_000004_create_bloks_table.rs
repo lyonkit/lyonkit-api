@@ -53,7 +53,7 @@ impl MigrationTrait for Migration {
             end if;
         
             -- Offset other priorities if conflict
-            update bloks b2 set priority = b2.priority + 1 where b1.page_id = new.page_id and b2.priority = new.priority and b2.id != new.id;
+            update bloks b2 set priority = b2.priority + 1 where b2.page_id = new.page_id and b2.priority = new.priority and b2.id != new.id;
         
             return new;
           end;

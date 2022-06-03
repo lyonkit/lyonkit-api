@@ -1,6 +1,10 @@
+mod blok;
 mod page;
 
-use crate::{middlewares::api_key::ApiKeyMiddlewareFactory, services::page::page_service};
+use crate::{
+  middlewares::api_key::ApiKeyMiddlewareFactory,
+  services::{blok::blok_service, page::page_service},
+};
 use actix_web::{
   dev::{ServiceFactory, ServiceRequest, ServiceResponse},
   get, web, HttpResponse, Responder, Scope,
@@ -36,4 +40,5 @@ pub fn api_services() -> Scope<
     .wrap(ApiKeyMiddlewareFactory::new())
     .service(ping)
     .service(page_service())
+    .service(blok_service())
 }

@@ -25,6 +25,7 @@ pub enum ApiError {
   DbError,
   DbDeserializeError,
   NotFound,
+  ReferenceNotFound(String),
 }
 
 impl Display for ApiError {
@@ -35,6 +36,7 @@ impl Display for ApiError {
       ApiError::ApiKeyReadOnly => write!(f, "ApiKeyError: This API key is readonly"),
       ApiError::DbError | ApiError::DbDeserializeError => write!(f, "Internal Server Error"),
       ApiError::NotFound => write!(f, "Not found"),
+      ApiError::ReferenceNotFound(reference) => write!(f, "Reference to \"{}\" not found", reference),
     }
   }
 }
@@ -48,6 +50,7 @@ impl ApiErrorTrait for ApiError {
       ApiError::DbError => String::from("DBERR"),
       ApiError::DbDeserializeError => String::from("DBDSE"),
       ApiError::NotFound => String::from("NTFND"),
+      ApiError::ReferenceNotFound(_) => String::from("REFNF"),
     }
   }
 
@@ -56,6 +59,7 @@ impl ApiErrorTrait for ApiError {
       ApiError::ApiKeyNotProvided | ApiError::ApiKeyInvalid => StatusCode::FORBIDDEN,
       ApiError::ApiKeyReadOnly => StatusCode::UNAUTHORIZED,
       ApiError::NotFound => StatusCode::NOT_FOUND,
+      ApiError::ReferenceNotFound(_) => StatusCode::BAD_REQUEST,
       _ => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
