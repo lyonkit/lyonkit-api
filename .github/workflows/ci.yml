@@ -9,11 +9,6 @@ on:
     branches:
       - main
 
-env:
-  DATABASE_URL: postgresql://postgres:root@localhost:5432/test
-  RUST_LOG: debug
-  TEST_LOG: true
-
 
 jobs:
   test:
@@ -23,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest] # , macos-latest]
+        os: [ubuntu-latest]
       fail-fast: false
 
     services:
@@ -42,6 +37,12 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+    env:
+      DATABASE_URL: postgresql://postgres:root@localhost:5432/test
+      RUST_LOG: debug
+      TEST_LOG: true
+      RUST_BACKTRACE: full
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
@@ -49,6 +50,8 @@ jobs:
           toolchain: nightly
           override: true
           profile: minimal
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v1
       - uses: actions-rs/cargo@v1
         with:
           command: test
