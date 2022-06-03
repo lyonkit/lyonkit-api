@@ -20,3 +20,6 @@ entity script *args:
 
 migration script *args:
     cargo {{script}} -p migration {{args}}
+
+build:
+    just server build --release
