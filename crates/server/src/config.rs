@@ -48,7 +48,7 @@ impl Settings {
     let parsed_url =
       Url::parse(self.database_url().as_str()).expect("Invalid database url (cannot parse)");
 
-    parsed_url.path().replace("/", "")
+    parsed_url.path().replace('/', "")
   }
 }
 

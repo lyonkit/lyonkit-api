@@ -15,8 +15,8 @@ test:
 server script *args:
     cargo {{script}} -p server {{args}}
 
-lint:
-    cargo clippy
+entity script *args:
+    cargo {{script}} -p entity {{args}}
 
-lintfix:
-    cargo clippy --fix
+migration script *args:
+    cargo {{script}} -p migration {{args}}
