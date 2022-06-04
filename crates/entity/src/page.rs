@@ -29,4 +29,16 @@ pub enum Relation {
   Namespace,
 }
 
+impl Related<crate::blok::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::Blok.def()
+  }
+}
+
+impl Related<crate::namespace::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::Namespace.def()
+  }
+}
+
 impl ActiveModelBehavior for ActiveModel {}

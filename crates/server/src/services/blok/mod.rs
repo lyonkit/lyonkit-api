@@ -4,6 +4,8 @@ use actix_web::{web::scope, Scope};
 mod models;
 mod routes;
 
+pub use models::BlokOutput;
+
 pub fn blok_service() -> Scope {
   scope("/blok")
     .service(get_blok)

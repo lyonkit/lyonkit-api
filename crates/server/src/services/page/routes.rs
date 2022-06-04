@@ -1,4 +1,5 @@
 use crate::middlewares::api_key::ApiKey;
+use crate::services::page::models::{PageOutputWithBloks, PathQuery};
 pub use crate::{
   errors::{utils::db_err_into_api_err, ApiError},
   middlewares::api_key::WriteApiKey,
@@ -7,7 +8,7 @@ pub use crate::{
 };
 use actix_web::{delete, get, post, put, web, Error as ActixError, HttpResponse};
 use entity::page::{Column, Entity, Model};
-use sea_orm::{prelude::*, ActiveValue::Set};
+use sea_orm::{prelude::*, ActiveValue::Set, Order};
 
 #[get("")]
 pub async fn list_pages(
@@ -30,23 +31,24 @@ pub async fn list_pages(
   )
 }
 
-#[get("/{id}")]
-pub async fn get_page(
+#[get("/wb")]
+pub async fn get_page_with_blok(
   data: web::Data<AppState>,
-  path_id: web::Path<i32>,
+  query: web::Query<PathQuery>,
   api_key: ApiKey,
 ) -> Result<HttpResponse, ActixError> {
-  let id = path_id.into_inner();
+  let path = query.path();
 
-  let page: Model = Entity::find()
+  let mut q = Entity::find()
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
-    .filter(Column::Id.eq(id))
-    .one(data.conn())
-    .await
-    .map_err(db_err_into_api_err)?
-    .ok_or(ApiError::NotFound)?;
+    .filter(Column::Path.eq(path.as_str()))
+    .find_with_related(entity::blok::Entity);
+  sea_orm::QueryTrait::query(&mut q).order_by(entity::blok::Column::Priority, Order::Desc);
+  let result = q.all(data.conn()).await.map_err(db_err_into_api_err)?;
 
-  Ok(HttpResponse::Ok().json(PageOutput::from(page)))
+  let result: &(Model, Vec<entity::blok::Model>) = result.get(0).ok_or(ApiError::NotFound)?;
+
+  Ok(HttpResponse::Ok().json(PageOutputWithBloks::from(result.to_owned())))
 }
 
 #[post("")]
