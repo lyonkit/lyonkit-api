@@ -2,6 +2,7 @@ use crate::{config::Settings, services::api_services};
 use actix_web::{web, App, HttpServer};
 use derive_more::Constructor;
 use getset::Getters;
+use migration::{Migrator, MigratorTrait};
 use sea_orm::DatabaseConnection;
 use tracing_actix_web::TracingLogger;
 
@@ -36,6 +37,14 @@ impl Server {
           "Failed to connect to the database, please ensure the given env DATABASE_URL is valid !",
         ),
     )
+  }
+
+  pub async fn migrate(self) -> Self {
+    Migrator::up(&self.database_connection, None)
+      .await
+      .expect("Failed to apply migrations");
+
+    self
   }
 
   pub fn build(self) -> std::io::Result<ActiveServer> {

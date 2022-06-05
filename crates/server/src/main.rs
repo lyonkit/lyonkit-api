@@ -16,7 +16,11 @@ static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
 async fn main() -> io::Result<()> {
   init_tracing();
 
-  let server = Server::from_settings(&*SETTINGS).await.build()?;
+  let server = Server::from_settings(&*SETTINGS)
+    .await
+    .migrate()
+    .await
+    .build()?;
 
   server.run_until_stopped().await?;
 

@@ -14,6 +14,7 @@ name = "lyonkit-api"
 
 [dependencies]
 entity = { path = "../entity" }
+migration = { path = "../migration" }
 actix-web = "4.0.1"
 tokio = { version = "1.19.0", features = ["macros", "rt-multi-thread"] }
 serde = "1.0.137"
@@ -38,7 +39,6 @@ async-trait = "0.1.56"
 once_cell = "1.12.0"
 
 [dev-dependencies]
-migration = { path = "../migration" }
 portpicker = "0.1.1"
 reqwest = { version = "0.11.10", features = ["__rustls", "json", "cookies"], default-features = false }
 test-context = "0.1.3"
