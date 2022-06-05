@@ -16,7 +16,7 @@ name = "lyonkit-api"
 entity = { path = "../entity" }
 migration = { path = "../migration" }
 actix-web = "4.0.1"
-tokio = { version = "1.19.0", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.19.1", features = ["macros", "rt-multi-thread"] }
 serde = "1.0.137"
 tracing = "0.1.34"
 tracing-actix-web = "0.5.1"
