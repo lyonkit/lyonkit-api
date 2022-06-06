@@ -25,6 +25,7 @@ WORKDIR /lyonkit-api
 
 COPY ./ .
 
+RUN cargo build -p health-check --target x86_64-unknown-linux-musl --release
 RUN cargo build -p server --target x86_64-unknown-linux-musl --release
 
 ####################################################################################################
@@ -40,8 +41,14 @@ WORKDIR /lyonkit-api
 
 # Copy our build
 COPY --from=builder /lyonkit-api/target/x86_64-unknown-linux-musl/release/lyonkit-api ./
+COPY --from=builder /lyonkit-api/target/x86_64-unknown-linux-musl/release/health-check ./
 
 # Use an unprivileged user.
 USER lyonkit-api:lyonkit-api
 
-CMD ["/lyonkit-api/lyonkit-api"]
+HEALTHCHECK --interval=1s --timeout=1s --start-period=2s --retries=3 CMD [ "/lyonkit-api/health-check" ]
+
+ENV PORT=8080
+EXPOSE $PORT
+
+ENTRYPOINT ["/lyonkit-api/lyonkit-api"]
