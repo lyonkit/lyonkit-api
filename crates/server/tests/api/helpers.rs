@@ -1,4 +1,8 @@
 use async_trait::async_trait;
+use aws_sdk_s3::model::BucketCannedAcl::PublicRead;
+use aws_sdk_s3::model::{Delete, ObjectIdentifier};
+use aws_sdk_s3::Client;
+use futures::future::try_join_all;
 use getset::{Getters, Setters};
 use migration::{Migrator, MigratorTrait};
 use once_cell::sync::Lazy as SyncLazy;
@@ -6,6 +10,8 @@ use portpicker::pick_unused_port;
 use reqwest::Method;
 use sea_orm::{ActiveModelTrait, ActiveValue, ConnectionTrait, DatabaseConnection};
 use serde::Serialize;
+use serde_json::json;
+use server::config::{S3Buckets, S3Config, S3Credentials};
 use server::{
   config::Settings,
   server::Server,
@@ -17,8 +23,15 @@ use url::Url;
 static TRACING: SyncLazy<()> = SyncLazy::new(|| {
   let default_filter_level = "info".to_string();
   let subscriber_name = "test".to_string();
-  match std::env::var("TEST_LOG") {
-    Ok(_) => {
+  let test_log = std::env::var("TEST_LOG").ok().and_then(|test_log| {
+    if test_log == "true" || test_log == "1" {
+      Some(test_log)
+    } else {
+      None
+    }
+  });
+  match test_log {
+    Some(_) => {
       init_subscriber(get_subscriber(
         subscriber_name,
         default_filter_level,
@@ -26,7 +39,7 @@ static TRACING: SyncLazy<()> = SyncLazy::new(|| {
         std::io::stdout,
       ));
     }
-    Err(_) => {
+    None => {
       init_subscriber(get_subscriber(
         subscriber_name,
         default_filter_level,
@@ -37,6 +50,56 @@ static TRACING: SyncLazy<()> = SyncLazy::new(|| {
   };
 });
 
+async fn wipe_bucket(s3_client: &Client, s3_bucket: &String) {
+  let objects = s3_client
+    .list_objects_v2()
+    .bucket(s3_bucket)
+    .send()
+    .await
+    .unwrap();
+
+  let mut delete_object_fut = Vec::new();
+  let mut len = 0;
+  let mut delete_keys = Delete::builder();
+
+  for obj in objects.contents().unwrap_or_default() {
+    if let Some(key) = obj.key() {
+      delete_keys = delete_keys.objects(ObjectIdentifier::builder().key(key).build());
+      len += 1;
+      if len >= 1000 {
+        delete_object_fut.push(
+          s3_client
+            .delete_objects()
+            .bucket(s3_bucket)
+            .delete(delete_keys.build())
+            .send(),
+        );
+        delete_keys = Delete::builder();
+        len = 0;
+      }
+    }
+  }
+
+  if len > 0 {
+    delete_object_fut.push(
+      s3_client
+        .delete_objects()
+        .bucket(s3_bucket)
+        .delete(delete_keys.build())
+        .send(),
+    );
+  }
+
+  try_join_all(delete_object_fut).await.ok();
+
+  s3_client
+    .delete_bucket()
+    .bucket(s3_bucket)
+    .send()
+    .await
+    .ok();
+}
+
 #[derive(Getters, Setters, Clone)]
 #[getset(get = "pub")]
 pub struct TestApp {
@@ -45,6 +108,8 @@ pub struct TestApp {
   port: u16,
   #[allow(unused)]
   database_connection: DatabaseConnection,
+  #[allow(unused)]
+  s3_client: aws_sdk_s3::Client,
   settings: Settings,
   http_client: reqwest::Client,
   #[getset(set = "pub")]
@@ -76,6 +141,25 @@ impl TestApp {
 
     request.send().await.expect("Failed to execute request")
   }
+  pub async fn req_multipart<U: AsRef<str>>(
+    &self,
+    method: Method,
+    uri: U,
+    body: reqwest::multipart::Form,
+  ) -> reqwest::Response {
+    let mut request = self.http_client.request(
+      method,
+      &format!("http://{}/api{}", self.address(), uri.as_ref()),
+    );
+
+    if let Some(api_key) = &self.active_api_key {
+      request = request.header("X-Api-Key", api_key);
+    }
+
+    request = request.multipart(body.into());
+
+    request.send().await.expect("Failed to execute request")
+  }
 
   pub async fn get<S: AsRef<str>>(&self, uri: S) -> reqwest::Response {
     self.req(Method::GET, uri, None as Option<()>).await
@@ -83,6 +167,14 @@ impl TestApp {
 
   pub async fn post<T: Serialize, S: AsRef<str>>(&self, uri: S, body: T) -> reqwest::Response {
     self.req(Method::POST, uri, Some(body)).await
+  }
+
+  pub async fn post_multipart<S: AsRef<str>>(
+    &self,
+    uri: S,
+    form: reqwest::multipart::Form,
+  ) -> reqwest::Response {
+    self.req_multipart(Method::POST, uri, form).await
   }
 
   pub async fn put<T: Serialize, S: AsRef<str>>(&self, uri: S, body: T) -> reqwest::Response {
@@ -126,6 +218,8 @@ impl TestApp {
       ))
       .await
       .expect("Failed to drop database");
+
+    wipe_bucket(&self.s3_client, self.settings().s3().buckets().image()).await;
   }
 }
 
@@ -164,6 +258,51 @@ async fn configure_database(settings: &Settings) -> DatabaseConnection {
   db_conn
 }
 
+async fn configure_s3(settings: &Settings) -> aws_sdk_s3::Client {
+  let client = aws_sdk_s3::Client::from_conf(settings.clone().into());
+  let bucket: &String = settings.s3().buckets().image();
+
+  client
+    .create_bucket()
+    .bucket(bucket)
+    .grant_read("*")
+    .grant_read_acp("*")
+    .send()
+    .await
+    .ok();
+
+  client
+    .put_public_access_block()
+    .bucket(bucket)
+    .send()
+    .await
+    .ok();
+
+  client
+    .put_bucket_policy()
+    .bucket(bucket)
+    .policy(
+      json!({
+        "Version":"2012-10-17",
+        "Statement":[
+          {
+            "Sid":"PublicRead",
+            "Effect":"Allow",
+            "Principal": "*",
+            "Action":["s3:GetObject"],
+            "Resource":[format!("arn:aws:s3:::{bucket}/*")]
+          }
+        ]
+      })
+      .to_string(),
+    )
+    .send()
+    .await
+    .ok();
+
+  client
+}
+
 pub async fn spawn_app() -> TestApp {
   SyncLazy::force(&TRACING);
 
@@ -177,15 +316,32 @@ pub async fn spawn_app() -> TestApp {
   };
 
   let port = pick_unused_port().expect("No available port");
+  let s3_bucket = String::from(format!(
+    "test{}",
+    uuid::Uuid::new_v4().to_string().replace("-", "")
+  ));
   let settings = Settings::new(
     String::from("test"),
     String::from("0.0.0.0"),
     port.to_string(),
     database_url,
     false,
+    S3Config::new(
+      std::env::var("S3__ENDPOINT").expect("No S3 endpoint specified"),
+      std::env::var("S3__BASE_URL").expect("No S3 base url specified"),
+      std::env::var("S3__REGION").expect("No S3 region specified"),
+      S3Credentials::new(
+        std::env::var("S3__CREDENTIALS__ACCESS_KEY_ID")
+          .expect("No S3 credentials access key specified"),
+        std::env::var("S3__CREDENTIALS__SECRET_ACCESS_KEY")
+          .expect("No S3 credentials secret key specified"),
+      ),
+      S3Buckets::new(s3_bucket),
+    ),
   );
 
   let database_connection = configure_database(&settings).await;
+  let s3_client = configure_s3(&settings).await;
 
   let server = Server::from_settings(&settings)
     .await
@@ -207,6 +363,7 @@ pub async fn spawn_app() -> TestApp {
     address,
     port,
     database_connection,
+    s3_client,
     settings,
     active_api_key: None,
   }

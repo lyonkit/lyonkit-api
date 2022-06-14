@@ -23,27 +23,53 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13.6
+        image: postgres:14.3-alpine
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: root
           POSTGRES_DB: test
         ports:
           - 5432:5432
-        # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+          --name postgres_container
+
+      s3:
+        image: bitnami/minio:2022
+        ports:
+          - "9000:9000"
+        volumes:
+          - storage:/data
+        env:
+          MINIO_ROOT_USER: lyonkit
+          MINIO_ROOT_PASSWORD: lyonkit-s3-secret
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/minio/health/live"
+          --health-interval 30s
+          --health-timeout 20s
+          --health-retries 3
+          --name s3_container
 
     env:
       DATABASE_URL: postgresql://postgres:root@localhost:5432/test
       RUST_LOG: debug
       TEST_LOG: true
       RUST_BACKTRACE: full
+      S3__ENDPOINT: "http://localhost:9000"
+      S3__BASE_URL: "http://localhost:9000"
+      S3__CREDENTIALS__ACCESS_KEY_ID: lyonkit
+      S3__CREDENTIALS__SECRET_ACCESS_KEY: lyonkit-s3-secret
+      S3__REGION: us-west-1
 
     steps:
+      - name: Increase max_connections and shared_buffers
+        run: |
+          docker exec -i postgres_container sed -i -e 's/max_connections = 100/max_connections = 1000/' /var/lib/postgresql/data/postgresql.conf &&
+          docker exec -i postgres_container sed -i -e 's/shared_buffers = 128MB/shared_buffers = 2GB/' /var/lib/postgresql/data/postgresql.conf &&
+          docker restart -t 0 postgres_container
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1
         with:

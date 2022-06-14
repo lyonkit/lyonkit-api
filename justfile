@@ -1,25 +1,40 @@
 set dotenv-load
 
-server script *args:
-    cargo {{script}} -p server {{args}}
-
-entity script *args:
-    cargo {{script}} -p entity {{args}}
-
-migration script *args:
-    cargo {{script}} -p migration {{args}}
+test_log := env_var_or_default("TEST_LOG", "false")
 
 build:
-    just server build --release
+    cargo build -p server --release
+
+start:
+    docker compose up -d
+
+start-rebuild:
+    docker compose up -d --build server
+
+stop:
+    docker compose down
+
+run *args:
+    docker compose run -e TEST_LOG={{test_log}} -e S3__BASE_URL=http://s3:9000 server {{args}}
+
+db +args:
+    docker compose run postgres {{args}}
+
+server script *args:
+    just run cargo {{script}} -p server {{args}}
+
+entity script *args:
+    just run cargo {{script}} -p entity {{args}}
+
+migration script *args:
+    just run cargo {{script}} -p migration {{args}}
 
 migrate +args:
     just migration run -- {{args}}
 
-run:
-    npm i -g bunyan && just server run | bunyan
-
-dev:
-    npm i -g bunyan && cargo-watch -C crates/server -s 'cargo run | bunyan'
-
 test *args:
-    cargo test -p server {{args}}
+    just server test {{args}}
+
+wipe:
+    just stop || echo ""
+    docker system prune --volumes -f

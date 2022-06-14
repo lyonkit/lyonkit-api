@@ -1,0 +1,65 @@
+version: '3.8'
+
+volumes:
+  db:
+  storage:
+
+services:
+  server:
+    build:
+      dockerfile: Dockerfile.dev
+      context: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      RUST_LOG: info
+      TELEMETRY: "false"
+      DATABASE_URL: "postgresql://lyonkit:lyonkit@postgres:5432/lyonkit"
+      S3__ENDPOINT: "http://s3:9000"
+      S3__BASE_URL: "http://localhost:9000"
+      S3__CREDENTIALS__ACCESS_KEY_ID: lyonkit
+      S3__CREDENTIALS__SECRET_ACCESS_KEY: lyonkit-s3-secret
+      S3__REGION: us-west-1
+    depends_on:
+      - postgres
+      - s3
+    volumes:
+      - .:/lyonkit-api
+
+
+  postgres:
+    image: postgres:14.3-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/
+    command: postgres -N 500
+    environment:
+      POSTGRES_USER: lyonkit
+      POSTGRES_PASSWORD: lyonkit
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+
+  s3:
+    image: bitnami/minio:2022
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - storage:/data
+    environment:
+      MINIO_ROOT_USER: lyonkit
+      MINIO_ROOT_PASSWORD: lyonkit-s3-secret
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+

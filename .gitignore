@@ -1,3 +1,5 @@
 /target
 .vscode
 .idea
+.env
+crates/server/tests/.output

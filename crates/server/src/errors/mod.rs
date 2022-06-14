@@ -1,6 +1,7 @@
 pub mod utils;
 
 use actix_web::{body::BoxBody, http::StatusCode, HttpResponse, ResponseError};
+use mime::Mime;
 use serde_json::json;
 use std::fmt::{Debug, Display, Formatter};
 
@@ -26,6 +27,10 @@ pub enum ApiError {
   DbDeserializeError,
   NotFound,
   ReferenceNotFound(String),
+  InvalidContentType(Vec<Mime>, Mime),
+  MissingField(String),
+  ImageNotDecodable,
+  InternalServerError,
 }
 
 impl Display for ApiError {
@@ -36,7 +41,24 @@ impl Display for ApiError {
       ApiError::ApiKeyReadOnly => write!(f, "ApiKeyError: This API key is readonly"),
       ApiError::DbError | ApiError::DbDeserializeError => write!(f, "Internal Server Error"),
       ApiError::NotFound => write!(f, "Not found"),
-      ApiError::ReferenceNotFound(reference) => write!(f, "Reference to \"{}\" not found", reference),
+      ApiError::ReferenceNotFound(reference) => {
+        write!(f, "Reference to \"{}\" not found", reference)
+      }
+      ApiError::InvalidContentType(expected, actual) => {
+        write!(
+          f,
+          "Invalid content-type \"{}\", expected one of \"{}\"",
+          actual,
+          expected
+            .iter()
+            .map(|v| v.to_string())
+            .collect::<Vec<String>>()
+            .join("\", \"")
+        )
+      }
+      ApiError::MissingField(field) => write!(f, "Missing field \"{}\"", field),
+      ApiError::ImageNotDecodable => write!(f, "Provide image is not decodable, make sure you provide a valid image or that you use a supported image format !"),
+      ApiError::InternalServerError => write!(f, "Internal Server Error"),
     }
   }
 }
@@ -51,6 +73,10 @@ impl ApiErrorTrait for ApiError {
       ApiError::DbDeserializeError => String::from("DBDSE"),
       ApiError::NotFound => String::from("NTFND"),
       ApiError::ReferenceNotFound(_) => String::from("REFNF"),
+      ApiError::InvalidContentType(_, _) => String::from("BADCT"),
+      ApiError::MissingField(_) => String::from("FLMIS"),
+      ApiError::ImageNotDecodable => String::from("IMGND"),
+      ApiError::InternalServerError => String::from("INTSE"),
     }
   }
 
@@ -59,7 +85,10 @@ impl ApiErrorTrait for ApiError {
       ApiError::ApiKeyNotProvided | ApiError::ApiKeyInvalid => StatusCode::FORBIDDEN,
       ApiError::ApiKeyReadOnly => StatusCode::UNAUTHORIZED,
       ApiError::NotFound => StatusCode::NOT_FOUND,
-      ApiError::ReferenceNotFound(_) => StatusCode::BAD_REQUEST,
+      ApiError::ReferenceNotFound(_)
+      | ApiError::InvalidContentType(_, _)
+      | ApiError::MissingField(_) => StatusCode::BAD_REQUEST,
+      ApiError::ImageNotDecodable => StatusCode::UNPROCESSABLE_ENTITY,
       _ => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }

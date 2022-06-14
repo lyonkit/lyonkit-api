@@ -1,6 +1,9 @@
 mod blok;
+mod image;
 mod page;
 
+use crate::middlewares::s3::S3ProviderMiddlewareFactory;
+use crate::services::image::image_service;
 use crate::{
   middlewares::api_key::ApiKeyMiddlewareFactory,
   services::{blok::blok_service, page::page_service},
@@ -38,7 +41,9 @@ pub fn api_services() -> Scope<
       .into()
     }))
     .wrap(ApiKeyMiddlewareFactory::new())
+    .wrap(S3ProviderMiddlewareFactory::new())
     .service(ping)
     .service(page_service())
     .service(blok_service())
+    .service(image_service())
 }

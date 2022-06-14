@@ -9,7 +9,7 @@ use tracing_actix_web::TracingLogger;
 #[derive(Clone, Getters, Constructor)]
 #[getset(get = "pub")]
 pub struct Server {
-  server_addr: String,
+  settings: Settings,
   database_connection: DatabaseConnection,
 }
 
@@ -17,6 +17,7 @@ pub struct Server {
 #[getset(get = "pub")]
 pub struct AppState {
   conn: DatabaseConnection,
+  settings: Settings,
 }
 
 #[derive(Getters)]
@@ -30,7 +31,7 @@ pub struct ActiveServer {
 impl Server {
   pub async fn from_settings(settings: &Settings) -> Self {
     Self::new(
-      settings.server_addr(),
+      settings.clone(),
       sea_orm::Database::connect(settings.database_url())
         .await
         .expect(
@@ -50,9 +51,10 @@ impl Server {
   pub fn build(self) -> std::io::Result<ActiveServer> {
     let app_state = AppState {
       conn: self.database_connection.clone(),
+      settings: self.settings.clone(),
     };
 
-    let server_addr = self.server_addr;
+    let server_addr = self.settings.server_addr();
 
     let server = HttpServer::new(move || {
       App::new()
