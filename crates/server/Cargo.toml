@@ -40,11 +40,11 @@ derive_more = "0.99.17"
 url = "2.2.2"
 async-trait = "0.1.56"
 once_cell = "1.12.0"
-aws-sdk-s3 = { version = "0.12.0" }
-aws-types = { version = "0.12.0" }
-aws-config = { version = "0.12.0" }
-aws-smithy-http = { version = "0.42.0", features = ["rt-tokio"] }
-aws-smithy-async = { version = "0.42.0", features = ["rt-tokio"] }
+aws-sdk-s3 = { version = "0.13.0" }
+aws-types = { version = "0.13.0" }
+aws-config = { version = "0.13.0" }
+aws-smithy-http = { version = "0.43.0", features = ["rt-tokio"] }
+aws-smithy-async = { version = "0.43.0", features = ["rt-tokio"] }
 image = { version = "0.24.2" }
 
 [dev-dependencies]
