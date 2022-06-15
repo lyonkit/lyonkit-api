@@ -38,3 +38,9 @@ test *args:
 wipe:
     just stop || echo ""
     docker system prune --volumes -f
+
+clippy:
+    just run cargo clippy --all-targets --all-features -- -D warnings
+
+fmt:
+    just run cargo fmt --all

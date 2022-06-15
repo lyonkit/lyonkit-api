@@ -1,5 +1,7 @@
-format_strings = true
-imports_granularity = "Crate"
+# unstable_features = true
+
+# format_strings = true
+# imports_granularity = "Crate"
 use_field_init_shorthand = true
-wrap_comments = true
+# wrap_comments = true
 tab_spaces = 2

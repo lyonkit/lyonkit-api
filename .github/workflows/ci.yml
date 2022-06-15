@@ -65,19 +65,30 @@ jobs:
       S3__REGION: us-west-1
 
     steps:
-      - name: Increase max_connections and shared_buffers
+      - name: Configure Postgres
         run: |
           docker exec -i postgres_container sed -i -e 's/max_connections = 100/max_connections = 1000/' /var/lib/postgresql/data/postgresql.conf &&
           docker exec -i postgres_container sed -i -e 's/shared_buffers = 128MB/shared_buffers = 2GB/' /var/lib/postgresql/data/postgresql.conf &&
           docker restart -t 0 postgres_container
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
-      - name: Rust cache
+          components: rustfmt, clippy
+      - name: Cache
         uses: Swatinem/rust-cache@v1
-      - uses: actions-rs/cargo@v1
+      - name: Rustfmt
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
+      - name: Test
+        uses: actions-rs/cargo@v1
         with:
           command: test
           args: -p server

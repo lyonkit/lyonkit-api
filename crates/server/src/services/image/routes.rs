@@ -22,6 +22,7 @@ use std::sync::Arc;
 use tracing::{error, warn, Instrument};
 use uuid::Uuid;
 
+#[allow(clippy::too_many_arguments)]
 async fn compress_and_upload(
   s3: S3ClientExt,
   bucket: Arc<String>,
