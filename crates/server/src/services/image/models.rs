@@ -70,6 +70,35 @@ impl
   }
 }
 
+impl From<(Arc<String>, entity::image::Model, entity::image::Model)> for ImageOutput {
+  fn from(
+    (bucket, image, lazy_image): (Arc<String>, entity::image::Model, entity::image::Model),
+  ) -> Self {
+    ImageOutput {
+      id: image.id,
+      public_url: format!(
+        "{base_url}/{bucket}/{id}",
+        base_url = (*SETTINGS).s3().base_url(),
+        id = image.storage_key
+      ),
+      lazy_image: LazyImageOutput {
+        id: lazy_image.id,
+        public_url: format!(
+          "{base_url}/{bucket}/{id}",
+          base_url = (*SETTINGS).s3().base_url(),
+          id = lazy_image.storage_key
+        ),
+        alt: lazy_image.alt,
+        created_at: lazy_image.created_at,
+        updated_at: lazy_image.updated_at,
+      },
+      alt: image.alt,
+      created_at: image.created_at,
+      updated_at: image.updated_at,
+    }
+  }
+}
+
 #[derive(Deserialize, Serialize, Getters)]
 #[getset(get = "pub")]
 pub struct ImageUploadQuery {

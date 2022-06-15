@@ -1,14 +1,15 @@
 use crate::errors::utils::db_err_into_api_err;
 use crate::errors::ApiError;
-use crate::middlewares::api_key::WriteApiKey;
+use crate::middlewares::api_key::{ApiKey, WriteApiKey};
 use crate::middlewares::s3::{S3ClientExt, S3ClientProvider};
 use crate::server::AppState;
 use crate::services::image::models::{ImageOutput, ImageUploadQuery};
 use actix_multipart::Multipart;
-use actix_web::{post, web, Error as ActixError, HttpResponse};
+use actix_web::{get, post, web, Error as ActixError, HttpResponse};
 use aws_sdk_s3::model::ObjectCannedAcl::PublicRead;
 use aws_sdk_s3::types::ByteStream;
 use aws_smithy_http::body::SdkBody;
+use entity::image::{Column, Entity, LazyImageLink, Model};
 use futures::future::ready;
 use futures::{StreamExt, TryFutureExt};
 use image::codecs::jpeg::JpegEncoder;
@@ -21,6 +22,41 @@ use std::path::Path;
 use std::sync::Arc;
 use tracing::{error, warn, Instrument};
 use uuid::Uuid;
+
+#[get("")]
+pub async fn list_images(
+  data: web::Data<AppState>,
+  api_key: ApiKey,
+) -> Result<HttpResponse, ActixError> {
+  let settings = data.settings();
+
+  let images: Vec<ImageOutput> = Entity::find()
+    .filter(Column::Namespace.eq(api_key.namespace().to_string()))
+    .filter(Column::LazyImageId.is_not_null())
+    .find_also_linked(LazyImageLink)
+    .all(data.conn())
+    .await
+    .map_err(|e| {
+      error!(
+        error_message = format!("{:?}", e).as_str(),
+        "An error occured while listing image"
+      );
+      ApiError::DbError
+    })?
+    .iter()
+    .map(|(img, lz_img_opt): &(Model, Option<Model>)| {
+      ImageOutput::from((
+        Arc::new(settings.s3().buckets().image().to_string()),
+        img.clone(),
+        lz_img_opt
+          .clone()
+          .expect("Query should not return null lazy image"),
+      ))
+    })
+    .collect::<Vec<_>>();
+
+  Ok(HttpResponse::Ok().json(images))
+}
 
 #[allow(clippy::too_many_arguments)]
 async fn compress_and_upload(

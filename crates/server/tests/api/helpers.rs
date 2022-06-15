@@ -1,5 +1,4 @@
 use async_trait::async_trait;
-use aws_sdk_s3::model::BucketCannedAcl::PublicRead;
 use aws_sdk_s3::model::{Delete, ObjectIdentifier};
 use aws_sdk_s3::Client;
 use futures::future::try_join_all;
