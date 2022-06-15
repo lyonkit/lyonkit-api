@@ -5,6 +5,7 @@ use std::path::Path;
 use url::Url;
 
 mod create;
+mod delete;
 mod read;
 
 pub(crate) fn assert_image_output(json: &Value) -> (Url, Url) {

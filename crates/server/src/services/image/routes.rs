@@ -1,3 +1,4 @@
+use crate::config::Settings;
 use crate::errors::utils::db_err_into_api_err;
 use crate::errors::ApiError;
 use crate::middlewares::api_key::{ApiKey, WriteApiKey};
@@ -5,7 +6,7 @@ use crate::middlewares::s3::{S3ClientExt, S3ClientProvider};
 use crate::server::AppState;
 use crate::services::image::models::{ImageOutput, ImageUploadQuery};
 use actix_multipart::Multipart;
-use actix_web::{get, post, web, Error as ActixError, HttpResponse};
+use actix_web::{delete, get, post, web, Error as ActixError, HttpResponse};
 use aws_sdk_s3::model::ObjectCannedAcl::PublicRead;
 use aws_sdk_s3::types::ByteStream;
 use aws_smithy_http::body::SdkBody;
@@ -257,4 +258,42 @@ pub async fn upload_image(
   .map_err(db_err_into_api_err)?;
 
   Ok(HttpResponse::Ok().json(ImageOutput::try_from((s3_bucket, image, image_lazy))?))
+}
+
+#[delete("/{id}")]
+pub async fn delete_image(
+  data: web::Data<AppState>,
+  api_key: WriteApiKey,
+  path_id: web::Path<i32>,
+) -> Result<HttpResponse, ActixError> {
+  let settings: &Settings = data.settings();
+  let id = path_id.into_inner();
+
+  let (image, lz_image) = Entity::find()
+    .filter(Column::Namespace.eq(api_key.namespace().to_string()))
+    .filter(Column::Id.eq(id))
+    .filter(Column::LazyImageId.is_not_null())
+    .find_also_linked(LazyImageLink)
+    .one(data.conn())
+    .await
+    .map_err(db_err_into_api_err)?
+    .and_then(
+      |(img, lz_img_opt): (Model, Option<Model>)| match lz_img_opt {
+        None => None,
+        Some(lz_img) => Some((img, lz_img)),
+      },
+    )
+    .ok_or(ApiError::NotFound)?;
+
+  image
+    .clone()
+    .delete(data.conn())
+    .await
+    .map_err(db_err_into_api_err)?;
+
+  Ok(HttpResponse::Ok().json(ImageOutput::from((
+    Arc::new(settings.s3().buckets().image().clone()),
+    image,
+    lz_image,
+  ))))
 }
