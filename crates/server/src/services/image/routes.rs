@@ -21,7 +21,7 @@ use sea_orm::ActiveValue::Set;
 use std::ffi::OsStr;
 use std::path::Path;
 use std::sync::Arc;
-use tracing::{error, warn, Instrument};
+use tracing::{error, info_span, instrument, warn};
 use uuid::Uuid;
 
 #[get("")]
@@ -60,6 +60,7 @@ pub async fn list_images(
 }
 
 #[allow(clippy::too_many_arguments)]
+#[instrument(skip(s3, image))]
 async fn compress_and_upload(
   s3: S3ClientExt,
   bucket: Arc<String>,
@@ -196,7 +197,7 @@ pub async fn upload_image(
               arc_filename.clone(),
               arc_content_type.clone(),
             )
-            .instrument(tracing::info_span!("image-processing").or_current())
+            .instrument(info_span!("MAIN_IMAGE_PROCESSING").or_current())
           )
           .map_err(|e| {
             error!(
@@ -219,7 +220,7 @@ pub async fn upload_image(
               arc_filename.clone(),
               arc_content_type.clone(),
             )
-            .instrument(tracing::info_span!("image-processing").or_current())
+            .instrument(info_span!("LAZY_IMAGE_PROCESSING").or_current())
           )
           .map_err(|e| {
             error!(
