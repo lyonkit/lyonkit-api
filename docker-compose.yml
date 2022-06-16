@@ -14,16 +14,19 @@ services:
       - "8080:8080"
     environment:
       RUST_LOG: info
-      TELEMETRY: "false"
+      TELEMETRY: "true"
       DATABASE_URL: "postgresql://lyonkit:lyonkit@postgres:5432/lyonkit"
       S3__ENDPOINT: "http://s3:9000"
       S3__BASE_URL: "http://localhost:9000"
       S3__CREDENTIALS__ACCESS_KEY_ID: lyonkit
       S3__CREDENTIALS__SECRET_ACCESS_KEY: lyonkit-s3-secret
       S3__REGION: us-west-1
+      OTEL_EXPORTER_JAEGER_AGENT_HOST: jaeger
+      OTEL_EXPORTER_JAEGER_AGENT_PORT: 6831
     depends_on:
       - postgres
       - s3
+      - jaeger
     volumes:
       - .:/lyonkit-api
 
@@ -62,4 +65,9 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
 

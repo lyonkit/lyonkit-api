@@ -183,18 +183,44 @@ pub async fn upload_image(
         let arc_image = Arc::new(image);
         let arc_content_type = Arc::new(content_type);
         let result: (String, String) = tokio::try_join!(
-          tokio::spawn(compress_and_upload(
-            s3_client.clone(),
-            s3_bucket.clone(),
-            arc_image.clone(),
-            1920,
-            1080,
-            FilterType::Triangle,
-            false,
-            s3_id.clone(),
-            arc_filename.clone(),
-            arc_content_type.clone(),
-          ))
+          tokio::spawn(
+            compress_and_upload(
+              s3_client.clone(),
+              s3_bucket.clone(),
+              arc_image.clone(),
+              1920,
+              1080,
+              FilterType::Triangle,
+              false,
+              s3_id.clone(),
+              arc_filename.clone(),
+              arc_content_type.clone(),
+            )
+            .instrument(tracing::info_span!("image-processing").or_current())
+          )
+          .map_err(|e| {
+            error!(
+              error_message = format!("{:?}", e).as_str(),
+              "An error occured while joining async task compress and upload"
+            );
+            ApiError::InternalServerError
+          })
+          .and_then(ready),
+          tokio::spawn(
+            compress_and_upload(
+              s3_client.clone(),
+              s3_bucket.clone(),
+              arc_image.clone(),
+              64,
+              36,
+              FilterType::Nearest,
+              true,
+              s3_id.clone(),
+              arc_filename.clone(),
+              arc_content_type.clone(),
+            )
+            .instrument(tracing::info_span!("image-processing").or_current())
+          )
           .map_err(|e| {
             error!(
               error_message = format!("{:?}", e).as_str(),
@@ -203,28 +229,6 @@ pub async fn upload_image(
             ApiError::InternalServerError
           })
           .and_then(ready)
-          .instrument(tracing::debug_span!("image-processing").or_current()),
-          tokio::spawn(compress_and_upload(
-            s3_client.clone(),
-            s3_bucket.clone(),
-            arc_image.clone(),
-            64,
-            36,
-            FilterType::Nearest,
-            true,
-            s3_id.clone(),
-            arc_filename.clone(),
-            arc_content_type.clone(),
-          ))
-          .map_err(|e| {
-            error!(
-              error_message = format!("{:?}", e).as_str(),
-              "An error occured while joining async task compress and upload"
-            );
-            ApiError::InternalServerError
-          })
-          .and_then(ready)
-          .instrument(tracing::debug_span!("image-processing").or_current())
         )?;
         image_upload_result = Some(result);
       }
