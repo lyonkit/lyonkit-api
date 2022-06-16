@@ -29,9 +29,19 @@ RUN cargo build -p health-check --target x86_64-unknown-linux-musl --release
 RUN cargo build -p server --target x86_64-unknown-linux-musl --release
 
 ####################################################################################################
+## Build CA Certificates
+####################################################################################################
+
+FROM alpine:3.16.0 as ca-certificates
+RUN apk add -U --no-cache ca-certificates
+
+####################################################################################################
 ## Final image
 ####################################################################################################
 FROM scratch
+
+# Import certificates
+COPY --from=ca-certificates /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Import from builder.
 COPY --from=builder /etc/passwd /etc/passwd

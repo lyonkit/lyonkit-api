@@ -14,6 +14,7 @@ static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
+  openssl_probe::init_ssl_cert_env_vars();
   init_tracing();
 
   let server = Server::from_settings(&*SETTINGS)
