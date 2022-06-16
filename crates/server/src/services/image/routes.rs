@@ -21,7 +21,7 @@ use sea_orm::ActiveValue::Set;
 use std::ffi::OsStr;
 use std::path::Path;
 use std::sync::Arc;
-use tracing::{error, info_span, instrument, warn};
+use tracing::{error, info_span, warn, Instrument};
 use uuid::Uuid;
 
 #[get("")]
@@ -60,7 +60,6 @@ pub async fn list_images(
 }
 
 #[allow(clippy::too_many_arguments)]
-#[instrument(skip(s3, image))]
 async fn compress_and_upload(
   s3: S3ClientExt,
   bucket: Arc<String>,
@@ -197,7 +196,19 @@ pub async fn upload_image(
               arc_filename.clone(),
               arc_content_type.clone(),
             )
-            .instrument(info_span!("MAIN_IMAGE_PROCESSING").or_current())
+            .instrument(
+              info_span!(
+                "MAIN_IMAGE_PROCESSING",
+                image_bucket = format!("{:?}", s3_bucket).as_str(),
+                image_width = 1920_u32,
+                image_height = 1080_u32,
+                image_filter = format!("{:?}", FilterType::Triangle).as_str(),
+                image_lazy = false,
+                image_filename = format!("{:?}", arc_filename).as_str(),
+                image_content_type = format!("{:?}", arc_content_type).as_str()
+              )
+              .or_current()
+            )
           )
           .map_err(|e| {
             error!(
@@ -220,7 +231,19 @@ pub async fn upload_image(
               arc_filename.clone(),
               arc_content_type.clone(),
             )
-            .instrument(info_span!("LAZY_IMAGE_PROCESSING").or_current())
+            .instrument(
+              info_span!(
+                "LAZY_IMAGE_PROCESSING",
+                image_bucket = format!("{:?}", s3_bucket).as_str(),
+                image_width = 64_u32,
+                image_height = 36_u32,
+                image_filter = format!("{:?}", FilterType::Nearest).as_str(),
+                image_lazy = true,
+                image_filename = format!("{:?}", arc_filename).as_str(),
+                image_content_type = format!("{:?}", arc_content_type).as_str()
+              )
+              .or_current()
+            )
           )
           .map_err(|e| {
             error!(

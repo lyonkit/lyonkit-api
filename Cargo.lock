@@ -3746,9 +3746,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "99bcebac55fba44eadf75a424ee403e756f9165596a613d125876388e5fb4c34"
 dependencies = [
  "actix-web",
+ "opentelemetry",
  "pin-project",
  "tracing",
  "tracing-futures",
+ "tracing-opentelemetry",
  "uuid",
 ]
 
