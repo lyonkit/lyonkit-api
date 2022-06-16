@@ -3,3 +3,5 @@
 .idea
 .env
 crates/server/tests/.output
+node_modules
+/clients/ts/dist/
