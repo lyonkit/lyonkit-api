@@ -56,10 +56,10 @@ export interface BlokOuput {
   updatedAt: string
 }
 
-export class LyonkitApiClient {
+export class LyonkitReadonlyApiClient {
   public readonly endpoint: string = 'https://lyonkit.leo-coletta.fr'
-  private readonly apiKey: string
-  private readonly fetch: $Fetch
+  protected readonly apiKey: string
+  protected readonly fetch: $Fetch
 
   constructor(params: { endpoint?: string; apiKey: string }) {
     if (params.endpoint)
@@ -80,6 +80,26 @@ export class LyonkitApiClient {
     return this.fetch('/image')
   }
 
+  // PAGES
+
+  public async listPages(): Promise<PageOuput> {
+    return this.fetch('/page')
+  }
+
+  public async getPage(path: string): Promise<PageOuputWithBloks> {
+    return this.fetch('/page/wb', { params: { path } })
+  }
+
+  // BLOKS
+
+  public async getBlok(blokId: number) {
+    return this.fetch(`/blok/${blokId}`)
+  }
+}
+
+export class LyonkitWriteApiClient extends LyonkitReadonlyApiClient {
+  // IMAGES
+
   public async createImage({ image, alt }: ImageInput): Promise<ImageOutput> {
     const form = new FormData()
     form.set('image', image)
@@ -91,14 +111,6 @@ export class LyonkitApiClient {
   }
 
   // PAGES
-
-  public async listPages(): Promise<PageOuput> {
-    return this.fetch('/page')
-  }
-
-  public async getPage(path: string): Promise<PageOuputWithBloks> {
-    return this.fetch('/page/wb', { params: { path } })
-  }
 
   public async createPage(page: PageInput): Promise<PageOuput> {
     return this.fetch('/page', { method: 'POST', body: page })
@@ -113,10 +125,6 @@ export class LyonkitApiClient {
   }
 
   // BLOKS
-
-  public async getBlok(blokId: number) {
-    return this.fetch(`/blok/${blokId}`)
-  }
 
   public async createBlok(blok: BlokInput) {
     return this.fetch('/blok', { method: 'POST', body: blok })
