@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.5](https://github.com/leo91000/lyonkit-api/compare/v1.1.4...v1.1.5) (2022-06-17)
+
+
+### Bug Fixes
+
+* Fix incorrect type on several methods ([f9f172f](https://github.com/leo91000/lyonkit-api/commit/f9f172f9731be723a4327a61d86d4615ec98cf4d))
+
 ### [1.1.4](https://github.com/leo91000/lyonkit-api/compare/v1.1.3...v1.1.4) (2022-06-17)
 
 ### [1.1.3](https://github.com/leo91000/lyonkit-api/compare/v1.1.2...v1.1.3) (2022-06-17)
