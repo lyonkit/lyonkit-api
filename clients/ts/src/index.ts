@@ -92,7 +92,7 @@ export class LyonkitReadonlyApiClient {
 
   // BLOKS
 
-  public async getBlok(blokId: number) {
+  public async getBlok(blokId: number): Promise<BlokOuput> {
     return this.fetch(`/blok/${blokId}`)
   }
 }
@@ -126,15 +126,15 @@ export class LyonkitWriteApiClient extends LyonkitReadonlyApiClient {
 
   // BLOKS
 
-  public async createBlok(blok: BlokInput) {
+  public async createBlok(blok: BlokInput): Promise<BlokOuput> {
     return this.fetch('/blok', { method: 'POST', body: blok })
   }
 
-  public async updateBlok({ blokId, update }: { blokId: number; update: BlokInput }) {
+  public async updateBlok({ blokId, update }: { blokId: number; update: BlokInput }): Promise<BlokOuput> {
     return this.fetch(`/blok/${blokId}`, { method: 'PUT', body: update })
   }
 
-  public async deleteBlok(blokId: number) {
+  public async deleteBlok(blokId: number): Promise<BlokOuput> {
     return this.fetch(`/blok/${blokId}`, { method: 'DELETE' })
   }
 }
