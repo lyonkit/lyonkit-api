@@ -23,6 +23,7 @@ services:
       S3__REGION: us-west-1
       OTEL_EXPORTER_JAEGER_AGENT_HOST: jaeger
       OTEL_EXPORTER_JAEGER_AGENT_PORT: 6831
+      CORS: http://localhost
     depends_on:
       - postgres
       - s3

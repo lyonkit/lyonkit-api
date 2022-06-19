@@ -17,6 +17,7 @@ entity = { path = "../entity" }
 migration = { path = "../migration" }
 actix-web = "4.1.0"
 actix-multipart = { version = "0.4.0" }
+actix-cors = { version = "0.6.1" }
 mime = { version = "0.3.16" }
 tokio = { version = "1.19.2", features = ["macros", "rt-multi-thread", "fs"] }
 tokio-util = { version = "0.7.3", features = ["codec"] }

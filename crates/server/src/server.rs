@@ -1,4 +1,7 @@
 use crate::{config::Settings, services::api_services};
+use actix_cors::Cors;
+use actix_web::http::header::{HeaderName, ORIGIN};
+use actix_web::http::Method;
 use actix_web::{web, App, HttpServer};
 use derive_more::Constructor;
 use getset::Getters;
@@ -49,15 +52,34 @@ impl Server {
   }
 
   pub fn build(self) -> std::io::Result<ActiveServer> {
+    let settings = self.settings();
+
     let app_state = AppState {
       conn: self.database_connection.clone(),
-      settings: self.settings.clone(),
+      settings: settings.clone(),
     };
 
-    let server_addr = self.settings.server_addr();
+    let server_addr = settings.server_addr();
+
+    let cors_endpoints = settings.cors().clone();
 
     let server = HttpServer::new(move || {
+      let mut cors = Cors::default()
+        .allowed_methods(&[
+          Method::GET,
+          Method::POST,
+          Method::PUT,
+          Method::PATCH,
+          Method::DELETE,
+        ])
+        .allowed_headers(&[HeaderName::try_from("X-Api-Key").unwrap(), ORIGIN]);
+
+      for endpoint in &cors_endpoints {
+        cors = cors.allowed_origin(endpoint.as_ref());
+      }
+
       App::new()
+        .wrap(cors)
         .wrap(TracingLogger::default())
         .app_data(web::Data::new(app_state.clone()))
         .service(api_services())

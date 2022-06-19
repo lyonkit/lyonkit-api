@@ -337,6 +337,7 @@ pub async fn spawn_app() -> TestApp {
       ),
       S3Buckets::new(s3_bucket),
     ),
+    Vec::new(),
   );
 
   let database_connection = configure_database(&settings).await;

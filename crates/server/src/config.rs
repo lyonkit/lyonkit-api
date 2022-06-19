@@ -20,6 +20,7 @@ pub struct Settings {
   database_url: String,
   telemetry: bool,
   s3: S3Config,
+  cors: Vec<String>,
 }
 
 #[derive(Deserialize, Getters, Constructor, Clone, Debug)]
@@ -93,7 +94,14 @@ impl Settings {
       .set_default("host", "0.0.0.0")?
       .set_default("telemetry", false)?
       .set_default("s3.buckets.image", "lyonkit-images")?
-      .add_source(Environment::default().separator("__").list_separator(","))
+      .set_default("cors", Vec::new() as Vec<String>)?
+      .add_source(
+        Environment::default()
+          .try_parsing(true)
+          .with_list_parse_key("cors")
+          .separator("__")
+          .list_separator(","),
+      )
       .build()
       .unwrap();
 
