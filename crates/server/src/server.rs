@@ -74,6 +74,7 @@ impl Server {
 
 impl ActiveServer {
   pub async fn run_until_stopped(self) -> std::io::Result<()> {
-    self.server.await
+    let res = self.server.await;
+    res
   }
 }

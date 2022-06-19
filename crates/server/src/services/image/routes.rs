@@ -10,6 +10,7 @@ use actix_web::{delete, get, post, web, Error as ActixError, HttpResponse};
 use aws_sdk_s3::model::ObjectCannedAcl::PublicRead;
 use aws_sdk_s3::types::ByteStream;
 use aws_smithy_http::body::SdkBody;
+use deunicode::deunicode;
 use entity::image::{Column, Entity, LazyImageLink, Model};
 use futures::future::ready;
 use futures::{StreamExt, TryFutureExt};
@@ -90,13 +91,26 @@ async fn compress_and_upload(
     image_output
   };
 
+  let file_stem = p_filename
+    .file_stem()
+    .and_then(OsStr::to_str)
+    .map(|v| {
+      // Cleanup filename
+      deunicode(v)
+        .chars()
+        .filter(|c| c.is_ascii())
+        .map(|c| match c {
+          ' ' => '_',
+          _ => c,
+        })
+        .collect::<String>()
+    })
+    .unwrap_or("unknown".to_string());
+
   let key = format!(
     "{}__{}{}.{}",
     id,
-    p_filename
-      .file_stem()
-      .and_then(OsStr::to_str)
-      .unwrap_or("unknown"),
+    file_stem,
     if lazy { "__lazy" } else { "" },
     "jpeg"
   );

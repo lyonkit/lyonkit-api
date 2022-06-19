@@ -23,7 +23,9 @@ async fn main() -> io::Result<()> {
     .await
     .build()?;
 
-  server.run_until_stopped().await?;
+  server.run_until_stopped().await.ok();
+
+  opentelemetry::global::shutdown_tracer_provider();
 
   Ok(())
 }
