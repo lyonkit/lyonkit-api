@@ -12,6 +12,7 @@ use std::{
   rc::Rc,
 };
 use tracing::{error, warn};
+use tracing::{info_span, Instrument};
 use uuid::Uuid;
 
 #[derive(Getters, Clone)]
@@ -151,6 +152,7 @@ where
         .expect("App state is not defined");
 
       let maybe_api_key = req.headers().get("x-api-key").and_then(|v| v.to_str().ok());
+      let mut api_entity: Option<api_key::Model> = None;
 
       if let Some(api_key) = maybe_api_key {
         let api_key_uuid = Uuid::parse_str(api_key);
@@ -170,6 +172,8 @@ where
             .ok()
             .flatten();
 
+          api_entity = api_key_entiy.clone();
+
           req
             .extensions_mut()
             .insert::<MaybeApiKey>(api_key_entiy.into());
@@ -178,7 +182,17 @@ where
         }
       }
 
-      let res = srv.call(req).await?;
+      let res = srv
+        .call(req)
+        .instrument(
+          info_span!(
+            "WITH_API_KEY_MIDDLEWARE",
+            api_key.namespace = ?api_entity.as_ref().map(|v| v.namespace.clone()),
+            api_key.read_only = ?api_entity.as_ref().map(|v| v.read_only)
+          )
+          .or_current(),
+        )
+        .await?;
       Ok(res)
     }
     .boxed_local()

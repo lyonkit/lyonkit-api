@@ -79,8 +79,8 @@ impl Server {
       }
 
       App::new()
-        .wrap(cors)
         .wrap(TracingLogger::default())
+        .wrap(cors)
         .app_data(web::Data::new(app_state.clone()))
         .service(api_services())
     })
