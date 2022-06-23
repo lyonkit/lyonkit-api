@@ -6,6 +6,12 @@ members = [
     "crates/health-check"
 ]
 
+[profile.release]
+lto = "fat"
+
+[profile.release.package.health-check]
+strip = "symbols"
+
 [package]
 name = "lyonkit-api"
 description = "Backend api for the lyonkit project"
