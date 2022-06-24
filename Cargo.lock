@@ -1971,6 +1971,11 @@ dependencies = [
 [[package]]
 name = "lyonkit-api"
 version = "0.1.0"
+dependencies = [
+ "jemallocator",
+ "server",
+ "tokio",
+]
 
 [[package]]
 name = "maplit"
@@ -3116,7 +3121,6 @@ dependencies = [
  "futures",
  "getset",
  "image",
- "jemallocator",
  "lazy_static",
  "migration",
  "mime",

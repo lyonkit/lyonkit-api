@@ -4,7 +4,7 @@
 FROM rust:latest AS builder
 
 RUN rustup target add x86_64-unknown-linux-musl
-RUN apt update && apt install -y musl-tools musl-dev
+RUN apt-get update && apt-get install -y musl-tools musl-dev
 RUN update-ca-certificates
 
 # Create appuser
@@ -26,7 +26,7 @@ WORKDIR /lyonkit-api
 COPY ./ .
 
 RUN cargo build -p health-check --target x86_64-unknown-linux-musl --release
-RUN cargo build -p server --target x86_64-unknown-linux-musl --release
+RUN cargo build --target x86_64-unknown-linux-musl --release
 
 ####################################################################################################
 ## Build CA Certificates

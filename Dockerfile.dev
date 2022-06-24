@@ -16,4 +16,4 @@ RUN cargo build -p server
 ENV PORT=8080
 EXPOSE $PORT
 
-CMD cargo-watch -C crates/server -s 'cargo run | bunyan'
+CMD cargo-watch -s 'cargo run | bunyan'

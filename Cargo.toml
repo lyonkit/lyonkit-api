@@ -6,6 +6,10 @@ members = [
     "crates/health-check"
 ]
 
+[[bin]]
+path = "src/main.rs"
+name = "lyonkit-api"
+
 [profile.release]
 lto = "fat"
 
@@ -18,3 +22,10 @@ description = "Backend api for the lyonkit project"
 version = "0.1.0"
 authors = ["Léo Coletta <leo.coletta@pm.me>"]
 edition = "2021"
+
+[dependencies]
+server = { path = "crates/server" }
+tokio = { version = "1.19.2", features = ["macros", "rt-multi-thread", "fs"] }
+
+[target.'cfg(not(target_env = "msvc"))'.dependencies]
+jemallocator = "0.5.0"
