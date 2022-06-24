@@ -78,8 +78,6 @@ jobs:
           profile: minimal
           toolchain: stable
           components: rustfmt, clippy
-      - name: Cache
-        uses: Swatinem/rust-cache@v1
       - name: Rustfmt
         run: cargo fmt --all -- --check
       - name: Clippy
