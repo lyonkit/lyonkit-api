@@ -55,7 +55,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://postgres:root@localhost:5432/test
-      RUST_LOG: debug
+      RUST_LOG: warn
       TEST_LOG: true
       RUST_BACKTRACE: full
       S3__ENDPOINT: "http://localhost:9000"
