@@ -1621,10 +1621,7 @@ dependencies = [
 name = "health-check"
 version = "0.1.0"
 dependencies = [
- "jemallocator",
- "openssl",
- "openssl-probe",
- "reqwest",
+ "minreq",
 ]
 
 [[package]]
@@ -2063,6 +2060,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6f5c75688da582b8ffc1f1799e9db273f32133c49e048f614d22ec3256773ccc"
 dependencies = [
  "adler",
+]
+
+[[package]]
+name = "minreq"
+version = "2.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4c785bc6027fd359756e538541c8624012ba3776d3d3fe123885643092ed4132"
+dependencies = [
+ "log",
 ]
 
 [[package]]
@@ -2725,14 +2731,12 @@ dependencies = [
  "http",
  "http-body",
  "hyper",
- "hyper-tls",
  "ipnet",
  "js-sys",
  "lazy_static",
  "log",
  "mime",
  "mime_guess",
- "native-tls",
  "percent-encoding",
  "pin-project-lite",
  "proc-macro-hack",
@@ -2740,7 +2744,6 @@ dependencies = [
  "serde_json",
  "serde_urlencoded",
  "tokio",
- "tokio-native-tls",
  "tokio-util",
  "tower-service",
  "url",

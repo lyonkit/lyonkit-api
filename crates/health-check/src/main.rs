@@ -1,23 +1,27 @@
-use std::process::exit;
+#[derive(Debug)]
+enum Error {
+  ReqError(minreq::Error),
+  StatusCodeNot200(i32),
+}
 
-#[cfg(not(target_env = "msvc"))]
-#[global_allocator]
-static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
+impl From<minreq::Error> for Error {
+  fn from(e: minreq::Error) -> Self {
+    Error::ReqError(e)
+  }
+}
 
-fn main() {
-  openssl_probe::init_ssl_cert_env_vars();
-
-  let res = reqwest::blocking::get(format!(
-    "{}://{}:{}/api/ping",
-    std::env::var("HC_SCHEME").unwrap_or_else(|_| "http".to_string()),
+fn main() -> Result<(), Error> {
+  let res = minreq::get(format!(
+    "http://{}:{}/api/ping",
     std::env::var("HC_HOST").unwrap_or_else(|_| "localhost".to_string()),
     std::env::var("HC_PORT").unwrap_or_else(|_| "8080".to_string())
   ))
-  .expect("Failed to get response from server");
+  .send()?;
 
-  if res.status().is_success() {
-    exit(0)
+  if res.status_code == 200 {
+    println!("{}", res.as_str()?);
+    Ok(())
   } else {
-    exit(1)
+    Err(Error::StatusCodeNot200(res.status_code))
   }
 }
