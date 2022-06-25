@@ -1,6 +1,6 @@
 use crate::{config::Settings, services::api_services};
 use actix_cors::Cors;
-use actix_web::http::header::{HeaderName, ORIGIN};
+use actix_web::http::header::{HeaderName, CONTENT_DISPOSITION, CONTENT_TYPE, ORIGIN};
 use actix_web::http::Method;
 use actix_web::{web, App, HttpServer};
 use derive_more::Constructor;
@@ -72,7 +72,12 @@ impl Server {
           Method::PATCH,
           Method::DELETE,
         ])
-        .allowed_headers(&[HeaderName::try_from("X-Api-Key").unwrap(), ORIGIN]);
+        .allowed_headers(&[
+          HeaderName::try_from("X-Api-Key").unwrap(),
+          ORIGIN,
+          CONTENT_TYPE,
+          CONTENT_DISPOSITION,
+        ]);
 
       for endpoint in &cors_endpoints {
         cors = cors.allowed_origin(endpoint.as_ref());
