@@ -2,7 +2,6 @@ use crate::errors::{utils::try_unwrap_active_value, ApiError};
 use crate::services::blok::BlokOutput;
 use chrono::{DateTime, Utc};
 use entity::page;
-use getset::Getters;
 use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
 
@@ -65,12 +64,6 @@ impl From<page::Model> for PageOutput {
       updated_at: model.updated_at,
     }
   }
-}
-
-#[derive(Deserialize, Serialize, Getters)]
-#[getset(get = "pub")]
-pub struct PathQuery {
-  path: String,
 }
 
 #[derive(Serialize, Clone)]

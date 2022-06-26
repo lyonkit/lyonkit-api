@@ -1,5 +1,5 @@
 use crate::middlewares::api_key::ApiKey;
-use crate::services::page::models::{PageOutputWithBloks, PathQuery};
+use crate::services::page::models::PageOutputWithBloks;
 pub use crate::{
   errors::{utils::db_err_into_api_err, ApiError},
   middlewares::api_key::WriteApiKey,
@@ -31,13 +31,13 @@ pub async fn list_pages(
   )
 }
 
-#[get("/wb")]
+#[get("/wb/{path}*")]
 pub async fn get_page_with_blok(
   data: web::Data<AppState>,
-  query: web::Query<PathQuery>,
+  path: web::Path<String>,
   api_key: ApiKey,
 ) -> Result<HttpResponse, ActixError> {
-  let path = query.path();
+  let path = format!("/{}", path);
 
   let mut q = Entity::find()
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))

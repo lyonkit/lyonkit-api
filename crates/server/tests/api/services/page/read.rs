@@ -78,7 +78,7 @@ async fn get_page_with_bloks_read_only_api_key_should_work(ctx: &mut TestApp) {
   let page = create_page(
     ctx,
     &json!({
-        "path": "/my-path",
+        "path": "/test/my-path",
         "title": "My Path Title",
         "description": "My Path Description"
     }),
@@ -142,7 +142,7 @@ async fn get_page_with_bloks_read_only_api_key_should_work(ctx: &mut TestApp) {
   .await;
 
   ctx.create_api_key("namespace", true).await;
-  let response = ctx.get("/page/wb?path=%2Fmy-path").await;
+  let response = ctx.get("/page/wb/test/my-path").await;
 
   assert_eq!(StatusCode::OK, response.status());
 

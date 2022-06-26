@@ -87,7 +87,7 @@ export class LyonkitReadonlyApiClient {
   }
 
   public async getPage(path: string): Promise<PageOutputWithBloks> {
-    return this.fetch('/page/wb', { params: { path } })
+    return this.fetch(`/page/wb${path}`)
   }
 
   // BLOKS
