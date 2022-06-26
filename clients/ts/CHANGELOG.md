@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/leo91000/lyonkit-api/compare/v1.1.5...v1.2.0) (2022-06-26)
+
+
+### Features
+
+* Added CORS preflights ([d4d7bf7](https://github.com/leo91000/lyonkit-api/commit/d4d7bf75a4b1f30672527ee0fafd402ca80a18bf))
+* Added middleware tracing span ([b9b29b5](https://github.com/leo91000/lyonkit-api/commit/b9b29b59d919b6ed12319a6857d9008f2f186460))
+
+
+### Bug Fixes
+
+* Added missing CORS headers ([c5e2eae](https://github.com/leo91000/lyonkit-api/commit/c5e2eae7c60761deb424103a79f42b2d82d59222))
+* Incorrect type for listPages method ([e56df35](https://github.com/leo91000/lyonkit-api/commit/e56df35d0d0602a7d40a70ad2f7fca956ac23337))
+* prevent using non ascii character in filename ([ae89a69](https://github.com/leo91000/lyonkit-api/commit/ae89a690c61f9d0c5d5c41035e78af9738faf194))
+
 ### [1.1.5](https://github.com/leo91000/lyonkit-api/compare/v1.1.4...v1.1.5) (2022-06-17)
 
 
