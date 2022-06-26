@@ -27,7 +27,7 @@ export interface PageInput {
   description?: string | undefined | null
   path: string
 }
-export interface PageOuput {
+export interface PageOutput {
   id: number
   title: string
   description: string | null
@@ -36,8 +36,8 @@ export interface PageOuput {
   createdAt: string
   updatedAt: string
 }
-export interface PageOuputWithBloks extends PageOuput {
-  bloks: BlokOuput[]
+export interface PageOutputWithBloks extends PageOutput {
+  bloks: BlokOutput[]
 }
 
 export interface BlokInput {
@@ -46,7 +46,7 @@ export interface BlokInput {
   props: Record<string, any>
   priority?: number | null | undefined
 }
-export interface BlokOuput {
+export interface BlokOutput {
   id: number
   pageId: number
   componentId: string
@@ -82,17 +82,17 @@ export class LyonkitReadonlyApiClient {
 
   // PAGES
 
-  public async listPages(): Promise<PageOuput[]> {
+  public async listPages(): Promise<PageOutput[]> {
     return this.fetch('/page')
   }
 
-  public async getPage(path: string): Promise<PageOuputWithBloks> {
+  public async getPage(path: string): Promise<PageOutputWithBloks> {
     return this.fetch('/page/wb', { params: { path } })
   }
 
   // BLOKS
 
-  public async getBlok(blokId: number): Promise<BlokOuput> {
+  public async getBlok(blokId: number): Promise<BlokOutput> {
     return this.fetch(`/blok/${blokId}`)
   }
 }
@@ -112,29 +112,29 @@ export class LyonkitWriteApiClient extends LyonkitReadonlyApiClient {
 
   // PAGES
 
-  public async createPage(page: PageInput): Promise<PageOuput> {
+  public async createPage(page: PageInput): Promise<PageOutput> {
     return this.fetch('/page', { method: 'POST', body: page })
   }
 
-  public async updatePage({ pageId, update }: { pageId: number; update: PageInput }): Promise<PageOuput> {
+  public async updatePage({ pageId, update }: { pageId: number; update: PageInput }): Promise<PageOutput> {
     return this.fetch(`/page/${pageId}`, { method: 'PUT', body: update })
   }
 
-  public async deletePage(pageId: number): Promise<PageOuput> {
+  public async deletePage(pageId: number): Promise<PageOutput> {
     return this.fetch(`/page/${pageId}`, { method: 'DELETE' })
   }
 
   // BLOKS
 
-  public async createBlok(blok: BlokInput): Promise<BlokOuput> {
+  public async createBlok(blok: BlokInput): Promise<BlokOutput> {
     return this.fetch('/blok', { method: 'POST', body: blok })
   }
 
-  public async updateBlok({ blokId, update }: { blokId: number; update: BlokInput }): Promise<BlokOuput> {
+  public async updateBlok({ blokId, update }: { blokId: number; update: BlokInput }): Promise<BlokOutput> {
     return this.fetch(`/blok/${blokId}`, { method: 'PUT', body: update })
   }
 
-  public async deleteBlok(blokId: number): Promise<BlokOuput> {
+  public async deleteBlok(blokId: number): Promise<BlokOutput> {
     return this.fetch(`/blok/${blokId}`, { method: 'DELETE' })
   }
 }
