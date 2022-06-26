@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.1](https://github.com/leo91000/lyonkit-api/compare/v1.2.0...v1.2.1) (2022-06-26)
+
+
+### Bug Fixes
+
+* Typo in typescript types ([8f1d06a](https://github.com/leo91000/lyonkit-api/commit/8f1d06aa309551ede8cd37f515b74ecfe0e4c34c))
+
 ## [1.2.0](https://github.com/leo91000/lyonkit-api/compare/v1.1.5...v1.2.0) (2022-06-26)
 
 
