@@ -82,7 +82,7 @@ export class LyonkitReadonlyApiClient {
 
   // PAGES
 
-  public async listPages(): Promise<PageOuput> {
+  public async listPages(): Promise<PageOuput[]> {
     return this.fetch('/page')
   }
 
