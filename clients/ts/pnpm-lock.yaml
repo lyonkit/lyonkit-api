@@ -6,13 +6,13 @@ specifiers:
   ohmyfetch: ^0.4.18
   standard-version: ^9.5.0
   typescript: 4.7.4
-  ufo: ^0.8.4
+  ufo: ^0.8.5
   unbuild: 0.7.4
   vitest: 0.17.1
 
 dependencies:
   ohmyfetch: 0.4.18
-  ufo: 0.8.4
+  ufo: 0.8.5
 
 devDependencies:
   '@antfu/eslint-config': 0.25.2_4x5o4skxv6sl53vpwefgt23khm
@@ -3014,7 +3014,7 @@ packages:
     dependencies:
       destr: 1.1.1
       node-fetch-native: 0.1.4
-      ufo: 0.8.4
+      ufo: 0.8.5
       undici: 5.6.0
     dev: false
 
@@ -3788,8 +3788,8 @@ packages:
     hasBin: true
     dev: true
 
-  /ufo/0.8.4:
-    resolution: {integrity: sha512-/+BmBDe8GvlB2nIflWasLLAInjYG0bC9HRnfEpNi4sw77J2AJNnEVnTDReVrehoh825+Q/evF3THXTAweyam2g==}
+  /ufo/0.8.5:
+    resolution: {integrity: sha512-e4+UtA5IRO+ha6hYklwj6r7BjiGMxS0O+UaSg9HbaTefg4kMkzj4tXzEBajRR+wkxf+golgAWKzLbytCUDMJAA==}
     dev: false
 
   /uglify-js/3.16.2:
