@@ -40,7 +40,7 @@ wipe:
     docker system prune --volumes -f
 
 clippy:
-    just run cargo clippy --all-targets --all-features -- -D warnings
+    just run cargo clippy --tests --benches --all-targets --all-features -- -D warnings
 
 fmt:
     just run cargo fmt --all

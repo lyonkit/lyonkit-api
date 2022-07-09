@@ -105,7 +105,7 @@ async fn compress_and_upload(
         })
         .collect::<String>()
     })
-    .unwrap_or("unknown".to_string());
+    .unwrap_or_else(|| "unknown".to_string());
 
   let key = format!(
     "{}__{}{}.{}",
@@ -319,12 +319,7 @@ pub async fn delete_image(
     .one(data.conn())
     .await
     .map_err(db_err_into_api_err)?
-    .and_then(
-      |(img, lz_img_opt): (Model, Option<Model>)| match lz_img_opt {
-        None => None,
-        Some(lz_img) => Some((img, lz_img)),
-      },
-    )
+    .and_then(|(img, lz_img_opt): (Model, Option<Model>)| lz_img_opt.map(|lz_img| (img, lz_img)))
     .ok_or(ApiError::NotFound)?;
 
   image
