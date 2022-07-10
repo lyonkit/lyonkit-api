@@ -186,13 +186,12 @@ pub async fn upload_image(
         })?;
 
         let s3_id = Arc::new(Uuid::new_v4().to_string());
-        let arc_filename = Arc::new(
-          field
-            .content_disposition()
-            .get_filename()
-            .map(ToString::to_string)
-            .unwrap_or_else(|| "unknown".to_string()),
-        );
+        let arc_filename: Arc<String> = field
+          .content_disposition()
+          .get_filename()
+          .map(ToString::to_string)
+          .unwrap_or_else(|| "unknown".to_string())
+          .into();
 
         let arc_image = Arc::new(image);
         let arc_content_type = Arc::new(content_type);
