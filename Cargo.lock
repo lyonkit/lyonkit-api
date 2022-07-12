@@ -2583,7 +2583,7 @@ dependencies = [
  "serde",
  "serde_json",
  "time 0.3.11",
- "uuid 1.1.2",
+ "uuid",
 ]
 
 [[package]]
@@ -2920,7 +2920,7 @@ dependencies = [
  "time 0.3.11",
  "tracing",
  "url",
- "uuid 1.1.2",
+ "uuid",
 ]
 
 [[package]]
@@ -2982,7 +2982,7 @@ dependencies = [
  "sea-query-driver",
  "serde_json",
  "time 0.3.11",
- "uuid 1.1.2",
+ "uuid",
 ]
 
 [[package]]
@@ -3170,7 +3170,7 @@ dependencies = [
  "tracing-opentelemetry",
  "tracing-subscriber",
  "url",
- "uuid 0.8.2",
+ "uuid",
 ]
 
 [[package]]
@@ -3344,7 +3344,7 @@ dependencies = [
  "time 0.3.11",
  "tokio-stream",
  "url",
- "uuid 1.1.2",
+ "uuid",
  "whoami",
 ]
 
@@ -3703,7 +3703,7 @@ dependencies = [
  "tracing",
  "tracing-futures",
  "tracing-opentelemetry",
- "uuid 1.1.2",
+ "uuid",
 ]
 
 [[package]]
@@ -3896,15 +3896,6 @@ name = "urlencoding"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68b90931029ab9b034b300b797048cf23723400aa757e8a2bfb9d748102f9821"
-
-[[package]]
-name = "uuid"
-version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "uuid"
