@@ -30,6 +30,7 @@ services:
       - jaeger
     volumes:
       - .:/lyonkit-api
+      - /lyonkit-api/target/
 
 
   postgres:
