@@ -56,6 +56,21 @@ export interface BlokOutput {
   updatedAt: string
 }
 
+export interface PostInput {
+  title: string,
+  description: string,
+  body: any,
+}
+export interface PostOutput {
+  id: number,
+  title: string,
+  description: string | null,
+  namespace: string,
+  body: any,
+  created_at: string,
+  updated_at: string,
+}
+
 export class LyonkitReadonlyApiClient {
   public readonly endpoint: string = 'https://lyonkit.leo-coletta.fr'
   protected readonly apiKey: string
@@ -94,6 +109,16 @@ export class LyonkitReadonlyApiClient {
 
   public async getBlok(blokId: number): Promise<BlokOutput> {
     return this.fetch(`/blok/${blokId}`)
+  }
+
+  // POSTS
+
+  public async listPosts(): Promise<PostOutput> {
+    return this.fetch('/post')
+  }
+
+  public async getPost(postId: number): Promise<PostOutput> {
+    return this.fetch(`/post/${postId}`)
   }
 }
 
@@ -136,5 +161,19 @@ export class LyonkitWriteApiClient extends LyonkitReadonlyApiClient {
 
   public async deleteBlok(blokId: number): Promise<BlokOutput> {
     return this.fetch(`/blok/${blokId}`, { method: 'DELETE' })
+  }
+
+  // POST
+
+  public async createPost(post: PostInput): Promise<PostOutput> {
+    return this.fetch('/post', { method: 'POST', body: post })
+  }
+
+  public async updatePost({ postId, update }: { postId: number; update: PostInput }): Promise<PostOutput> {
+    return this.fetch(`/post/${postId}`, { method: 'PUT', body: update })
+  }
+
+  public async deletePost(postId: number): Promise<PostOutput> {
+    return this.fetch(`/post/${postId}`, { method: 'DELETE' })
   }
 }

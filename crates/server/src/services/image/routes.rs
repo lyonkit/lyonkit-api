@@ -185,7 +185,7 @@ pub async fn upload_image(
           ApiError::ImageNotDecodable
         })?;
 
-        let s3_id = Arc::new(Uuid::new_v4().to_string());
+        let s3_id: Arc<String> = Uuid::new_v4().to_string().into();
         let arc_filename: Arc<String> = field
           .content_disposition()
           .get_filename()
