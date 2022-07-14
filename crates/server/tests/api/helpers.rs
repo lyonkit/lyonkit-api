@@ -49,6 +49,7 @@ static TRACING: SyncLazy<()> = SyncLazy::new(|| {
   };
 });
 
+/// Deletes a bucket from S3 by removing all its files first
 async fn wipe_bucket(s3_client: &Client, s3_bucket: &String) {
   let objects = s3_client
     .list_objects_v2()
@@ -315,10 +316,7 @@ pub async fn spawn_app() -> TestApp {
   };
 
   let port = pick_unused_port().expect("No available port");
-  let s3_bucket = String::from(format!(
-    "test{}",
-    uuid::Uuid::new_v4().to_string().replace("-", "")
-  ));
+  let s3_bucket = format!("test{}", uuid::Uuid::new_v4().to_string().replace('-', ""));
   let settings = Settings::new(
     String::from("test"),
     String::from("0.0.0.0"),

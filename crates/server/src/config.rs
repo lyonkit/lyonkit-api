@@ -114,8 +114,10 @@ impl Settings {
 
   #[allow(unused)]
   pub fn database_url_without_db(&self) -> String {
-    let mut parsed_url =
-      Url::parse(self.database_url().as_str()).expect("Invalid database url (cannot parse)");
+    let mut parsed_url: Url = self
+      .database_url()
+      .parse()
+      .expect("Invalid database url (cannot parse)");
 
     parsed_url.set_path("");
     parsed_url.to_string()
@@ -123,8 +125,10 @@ impl Settings {
 
   #[allow(unused)]
   pub fn database_name(&self) -> String {
-    let parsed_url =
-      Url::parse(self.database_url().as_str()).expect("Invalid database url (cannot parse)");
+    let parsed_url: Url = self
+      .database_url()
+      .parse()
+      .expect("Invalid database url (cannot parse)");
 
     parsed_url.path().replace('/', "")
   }

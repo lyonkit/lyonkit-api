@@ -22,7 +22,7 @@ pub async fn create_image(
 
   let file_handle = File::open(file_path)
     .await
-    .expect(format!("Failed to open image at {}", file_path).as_str());
+    .unwrap_or_else(|_| panic!("Failed to open image at {}", file_path));
 
   let bytes_stream = FramedRead::new(file_handle, BytesCodec::new());
 
