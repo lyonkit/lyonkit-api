@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/leo91000/lyonkit-api/compare/v1.2.2...v1.3.0) (2022-07-14)
+
+
+### Features
+
+* Added `post` resource ([2dfb0c5](https://github.com/leo91000/lyonkit-api/commit/2dfb0c56080f3af1fbdd241d54eb129d23c0e04b))
+* Added `post` resource to typescript client ([9756f5b](https://github.com/leo91000/lyonkit-api/commit/9756f5bf4d09ffaa8be097a0c96e0151f472721f))
+
 ### [1.2.2](https://github.com/leo91000/lyonkit-api/compare/v1.2.1...v1.2.2) (2022-06-26)
 
 ### [1.2.1](https://github.com/leo91000/lyonkit-api/compare/v1.2.0...v1.2.1) (2022-06-26)
