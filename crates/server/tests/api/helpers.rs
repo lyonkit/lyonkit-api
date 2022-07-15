@@ -1,7 +1,6 @@
+use crate::utils;
 use async_trait::async_trait;
-use aws_sdk_s3::model::{Delete, ObjectIdentifier};
 use aws_sdk_s3::Client;
-use futures::future::try_join_all;
 use getset::{Getters, Setters};
 use migration::{Migrator, MigratorTrait};
 use once_cell::sync::Lazy as SyncLazy;
@@ -16,13 +15,15 @@ use server::{
   server::Server,
   telemetry::{get_subscriber, init_subscriber},
 };
+use std::env;
 use test_context::AsyncTestContext;
 use url::Url;
+use uuid::Uuid;
 
 static TRACING: SyncLazy<()> = SyncLazy::new(|| {
   let default_filter_level = "info".to_string();
   let subscriber_name = "test".to_string();
-  let test_log = std::env::var("TEST_LOG").ok().and_then(|test_log| {
+  let test_log = env::var("TEST_LOG").ok().and_then(|test_log| {
     if test_log == "true" || test_log == "1" {
       Some(test_log)
     } else {
@@ -48,57 +49,6 @@ static TRACING: SyncLazy<()> = SyncLazy::new(|| {
     }
   };
 });
-
-/// Deletes a bucket from S3 by removing all its files first
-async fn wipe_bucket(s3_client: &Client, s3_bucket: &String) {
-  let objects = s3_client
-    .list_objects_v2()
-    .bucket(s3_bucket)
-    .send()
-    .await
-    .unwrap();
-
-  let mut delete_object_fut = Vec::new();
-  let mut len = 0;
-  let mut delete_keys = Delete::builder();
-
-  for obj in objects.contents().unwrap_or_default() {
-    if let Some(key) = obj.key() {
-      delete_keys = delete_keys.objects(ObjectIdentifier::builder().key(key).build());
-      len += 1;
-      if len >= 1000 {
-        delete_object_fut.push(
-          s3_client
-            .delete_objects()
-            .bucket(s3_bucket)
-            .delete(delete_keys.build())
-            .send(),
-        );
-        delete_keys = Delete::builder();
-        len = 0;
-      }
-    }
-  }
-
-  if len > 0 {
-    delete_object_fut.push(
-      s3_client
-        .delete_objects()
-        .bucket(s3_bucket)
-        .delete(delete_keys.build())
-        .send(),
-    );
-  }
-
-  try_join_all(delete_object_fut).await.ok();
-
-  s3_client
-    .delete_bucket()
-    .bucket(s3_bucket)
-    .send()
-    .await
-    .ok();
-}
 
 #[derive(Getters, Setters, Clone)]
 #[getset(get = "pub")]
@@ -219,7 +169,7 @@ impl TestApp {
       .await
       .expect("Failed to drop database");
 
-    wipe_bucket(&self.s3_client, self.settings().s3().buckets().image()).await;
+    utils::wipe_bucket(&self.s3_client, self.settings().s3().buckets().image()).await;
   }
 }
 
@@ -258,8 +208,8 @@ async fn configure_database(settings: &Settings) -> DatabaseConnection {
   db_conn
 }
 
-async fn configure_s3(settings: &Settings) -> aws_sdk_s3::Client {
-  let client = aws_sdk_s3::Client::from_conf(settings.clone().into());
+async fn configure_s3(settings: &Settings) -> Client {
+  let client = Client::from_conf(settings.clone().into());
   let bucket: &String = settings.s3().buckets().image();
 
   client
@@ -306,17 +256,19 @@ async fn configure_s3(settings: &Settings) -> aws_sdk_s3::Client {
 pub async fn spawn_app() -> TestApp {
   SyncLazy::force(&TRACING);
 
-  let test_db_name = uuid::Uuid::new_v4().to_string();
+  let test_db_name = Uuid::new_v4().to_string();
 
   let database_url = {
-    let url = std::env::var("DATABASE_URL").expect("No database url specified");
-    let mut parsed = Url::parse(&url).expect("Invalid database url (cannot parse)");
-    parsed.set_path(&*format!("/{}", test_db_name));
-    parsed.to_string()
+    let mut url: Url = env::var("DATABASE_URL")
+      .expect("No database url specified")
+      .parse()
+      .expect("Invalid database url (cannot parse)");
+    url.set_path(&*format!("/{}", test_db_name));
+    url.to_string()
   };
 
   let port = pick_unused_port().expect("No available port");
-  let s3_bucket = format!("test{}", uuid::Uuid::new_v4().to_string().replace('-', ""));
+  let s3_bucket = format!("test{}", Uuid::new_v4().to_string().replace('-', ""));
   let settings = Settings::new(
     String::from("test"),
     String::from("0.0.0.0"),
@@ -324,13 +276,12 @@ pub async fn spawn_app() -> TestApp {
     database_url,
     false,
     S3Config::new(
-      std::env::var("S3__ENDPOINT").expect("No S3 endpoint specified"),
-      std::env::var("S3__BASE_URL").expect("No S3 base url specified"),
-      std::env::var("S3__REGION").expect("No S3 region specified"),
+      env::var("S3__ENDPOINT").expect("No S3 endpoint specified"),
+      env::var("S3__BASE_URL").expect("No S3 base url specified"),
+      env::var("S3__REGION").expect("No S3 region specified"),
       S3Credentials::new(
-        std::env::var("S3__CREDENTIALS__ACCESS_KEY_ID")
-          .expect("No S3 credentials access key specified"),
-        std::env::var("S3__CREDENTIALS__SECRET_ACCESS_KEY")
+        env::var("S3__CREDENTIALS__ACCESS_KEY_ID").expect("No S3 credentials access key specified"),
+        env::var("S3__CREDENTIALS__SECRET_ACCESS_KEY")
           .expect("No S3 credentials secret key specified"),
       ),
       S3Buckets::new(s3_bucket),
