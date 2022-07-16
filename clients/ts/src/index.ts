@@ -46,6 +46,12 @@ export interface BlokInput {
   props: Record<string, any>
   priority?: number | null | undefined
 }
+export interface BlokPatchInput {
+  pageId?: number | undefined
+  componentId?: string | undefined
+  props?: Record<string, any> | undefined
+  priority?: number | undefined
+}
 export interface BlokOutput {
   id: number
   pageId: number
@@ -157,6 +163,10 @@ export class LyonkitWriteApiClient extends LyonkitReadonlyApiClient {
 
   public async updateBlok({ blokId, update }: { blokId: number; update: BlokInput }): Promise<BlokOutput> {
     return this.fetch(`/blok/${blokId}`, { method: 'PUT', body: update })
+  }
+
+  public async patchBlok({ blokId, patch }: { blokId: number; patch: BlokPatchInput }): Promise<BlokOutput> {
+    return this.fetch(`/blok/${blokId}`, { method: 'PATCH', body: patch })
   }
 
   public async deleteBlok(blokId: number): Promise<BlokOutput> {
