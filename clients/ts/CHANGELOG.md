@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/leo91000/lyonkit-api/compare/v1.3.0...v1.4.0) (2022-07-16)
+
+
+### Features
+
+* Added `blok` patch method ([c50e1d9](https://github.com/leo91000/lyonkit-api/commit/c50e1d9f068b824212a94479d276437f376b7ff7))
+* Added patch blok method to typescript client ([7a9b7c2](https://github.com/leo91000/lyonkit-api/commit/7a9b7c2e99a86522c05320962f430cdcad213043))
+
 ## [1.3.0](https://github.com/leo91000/lyonkit-api/compare/v1.2.2...v1.3.0) (2022-07-14)
 
 
