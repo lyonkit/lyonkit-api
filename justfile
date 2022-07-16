@@ -44,3 +44,6 @@ clippy:
 
 fmt:
     just run cargo fmt --all
+
+release:
+    pnpm -C clients/ts run release && cp clients/ts/CHANGELOG.md CHANGELOG.md && git add . && git commit -m "chore: Update changelog" && git push
