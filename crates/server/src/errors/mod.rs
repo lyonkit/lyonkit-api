@@ -31,6 +31,8 @@ pub enum ApiError {
   MissingField(String),
   ImageNotDecodable,
   InternalServerError,
+  PatchNotNullable(String),
+  PatchAtLeastOneField,
 }
 
 impl Display for ApiError {
@@ -59,6 +61,8 @@ impl Display for ApiError {
       ApiError::MissingField(field) => write!(f, "Missing field \"{}\"", field),
       ApiError::ImageNotDecodable => write!(f, "Provide image is not decodable, make sure you provide a valid image or that you use a supported image format !"),
       ApiError::InternalServerError => write!(f, "Internal Server Error"),
+      ApiError::PatchNotNullable(field) => write!(f, "Field {field} is not nullable"),
+      ApiError::PatchAtLeastOneField => write!(f, "You must patch at least one field"),
     }
   }
 }
@@ -77,6 +81,8 @@ impl ApiErrorTrait for ApiError {
       ApiError::MissingField(_) => String::from("FLMIS"),
       ApiError::ImageNotDecodable => String::from("IMGND"),
       ApiError::InternalServerError => String::from("INTSE"),
+      ApiError::PatchNotNullable(_) => String::from("PTHNN"),
+      ApiError::PatchAtLeastOneField => String::from("PTHOF"),
     }
   }
 
@@ -87,6 +93,8 @@ impl ApiErrorTrait for ApiError {
       ApiError::NotFound => StatusCode::NOT_FOUND,
       ApiError::ReferenceNotFound(_)
       | ApiError::InvalidContentType(_, _)
+      | ApiError::PatchNotNullable(_)
+      | ApiError::PatchAtLeastOneField
       | ApiError::MissingField(_) => StatusCode::BAD_REQUEST,
       ApiError::ImageNotDecodable => StatusCode::UNPROCESSABLE_ENTITY,
       _ => StatusCode::INTERNAL_SERVER_ERROR,

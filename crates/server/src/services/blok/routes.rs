@@ -1,15 +1,18 @@
+use super::models::{BlokInput, BlokOutput};
 use crate::middlewares::api_key::ApiKey;
+use crate::services::blok::models::BlokPatchInput;
+use crate::utils::serde_json_patch::Patch::Value;
 use crate::{
   errors::{utils::db_err_into_api_err, ApiError},
   middlewares::api_key::WriteApiKey,
   server::AppState,
-  services::blok::models::{BlokInput, BlokOutput},
 };
-use actix_web::{delete, get, post, put, web, Error as ActixError, HttpResponse};
+use actix_web::{delete, get, patch, post, put, web, Error as ActixError, HttpResponse};
 use entity::blok::{Column, Entity, Model};
 use entity::page::{Column as PageColumn, Entity as PageEntity};
 use sea_orm::prelude::*;
 use sea_orm::ActiveValue::Set;
+use sea_orm::IntoActiveModel;
 
 #[get("/{id}")]
 pub async fn get_blok(
@@ -99,6 +102,90 @@ pub async fn update_blok(
 
   Ok(
     model
+      .save(data.conn())
+      .await
+      .map_err(db_err_into_api_err)
+      .and_then(|model| Ok(HttpResponse::Ok().json(BlokOutput::try_from(model)?)))?,
+  )
+}
+
+#[patch("/{id}")]
+pub async fn patch_blok(
+  data: web::Data<AppState>,
+  path_id: web::Path<i32>,
+  body: web::Json<BlokPatchInput>,
+  api_key: WriteApiKey,
+) -> Result<HttpResponse, ActixError> {
+  let id = path_id.into_inner();
+
+  if body.page_id().is_null() {
+    return Err(ApiError::PatchNotNullable(String::from("pageId")).into());
+  }
+
+  if body.component_id().is_null() {
+    return Err(ApiError::PatchNotNullable(String::from("componentId")).into());
+  }
+
+  if body.props().is_null() {
+    return Err(ApiError::PatchNotNullable(String::from("props")).into());
+  }
+
+  if body.priority().is_null() {
+    return Err(ApiError::PatchNotNullable(String::from("priority")).into());
+  }
+
+  if body.page_id().is_missing()
+    && body.component_id().is_missing()
+    && body.props().is_missing()
+    && body.priority().is_missing()
+  {
+    return Err(ApiError::PatchAtLeastOneField.into());
+  }
+
+  let mut blok = Entity::find()
+    .find_also_related(PageEntity)
+    .filter(Column::Id.eq(id))
+    .one(data.conn())
+    .await
+    .map_err(db_err_into_api_err)?
+    .and_then(|(blok, page)| page.map(|p| (blok, p)))
+    .and_then(|(blok, page)| {
+      if &page.namespace == api_key.namespace() {
+        return Some(blok);
+      }
+      None
+    })
+    .ok_or(ApiError::NotFound)?
+    .into_active_model();
+
+  if let Value(page_id) = body.page_id() {
+    PageEntity::find()
+      .filter(PageColumn::Namespace.eq(api_key.namespace().to_owned()))
+      .filter(PageColumn::Id.eq(*page_id))
+      .one(data.conn())
+      .await
+      .map_err(db_err_into_api_err)?
+      .ok_or_else(|| ApiError::ReferenceNotFound("pageId".to_string()))?;
+
+    blok.page_id = Set(*page_id);
+  }
+
+  if let Value(component_id) = body.component_id() {
+    blok.component_id = Set(component_id.clone());
+  }
+
+  if let Value(props) = body.props() {
+    blok.props = Set(props.clone());
+  }
+
+  if let Value(priority) = body.priority() {
+    blok.priority = Set(*priority);
+  }
+
+  blok.id = Set(id);
+
+  Ok(
+    blok
       .save(data.conn())
       .await
       .map_err(db_err_into_api_err)

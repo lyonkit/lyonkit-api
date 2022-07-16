@@ -65,7 +65,7 @@ async fn create_valid_blok_should_work(ctx: &mut TestApp) {
   )
   .await;
 
-  assert_eq!(blok.get("priority"), Some(&Value::Number(Number::from(0))));
+  assert_eq!(blok.get("priority"), Some(&Value::Number(Number::from(1))));
 }
 
 #[test_context(TestApp)]

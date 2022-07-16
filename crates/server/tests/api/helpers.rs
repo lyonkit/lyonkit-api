@@ -131,6 +131,10 @@ impl TestApp {
     self.req(Method::PUT, uri, Some(body)).await
   }
 
+  pub async fn patch<T: Serialize, S: AsRef<str>>(&self, uri: S, body: T) -> reqwest::Response {
+    self.req(Method::PATCH, uri, Some(body)).await
+  }
+
   pub async fn delete<S: AsRef<str>>(&self, uri: S) -> reqwest::Response {
     self.req(Method::DELETE, uri, None as Option<()>).await
   }

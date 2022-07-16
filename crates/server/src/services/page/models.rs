@@ -1,5 +1,5 @@
 use crate::errors::{utils::try_unwrap_active_value, ApiError};
-use crate::services::blok::BlokOutput;
+use crate::services::blok::models::BlokOutput;
 use chrono::{DateTime, Utc};
 use entity::page;
 use sea_orm::ActiveValue::Set;

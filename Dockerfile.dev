@@ -9,9 +9,9 @@ RUN cargo install cargo-watch just
 
 WORKDIR /lyonkit-api
 
-COPY ./ .
+COPY ./ .\
 
-RUN cargo build -p server
+RUN cargo build && cargo test --no-run
 
 ENV PORT=8080
 EXPOSE $PORT

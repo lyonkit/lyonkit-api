@@ -9,6 +9,7 @@ pub mod middlewares;
 pub mod server;
 pub mod services;
 pub mod telemetry;
+mod utils;
 
 pub async fn main() -> io::Result<()> {
   openssl_probe::init_ssl_cert_env_vars();
