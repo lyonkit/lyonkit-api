@@ -1,11 +1,9 @@
 FROM rust:1.62 AS builder
 
-RUN rustup target add x86_64-unknown-linux-gnu
 RUN apt update && apt install -y nodejs npm
 RUN npm i -g npm bunyan
 RUN update-ca-certificates
 RUN cargo install cargo-watch just
-RUN rustup component add rustfmt clippy
 
 WORKDIR /lyonkit-api
 
