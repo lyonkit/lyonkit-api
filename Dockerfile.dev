@@ -1,17 +1,17 @@
-FROM rust:latest AS builder
+FROM rust:1.62 AS builder
 
-RUN rustup target add x86_64-unknown-linux-musl
-RUN apt update && apt install -y musl-tools musl-dev nodejs npm
+RUN rustup target add x86_64-unknown-linux-gnu
+RUN apt update && apt install -y nodejs npm
 RUN npm i -g npm bunyan
 RUN update-ca-certificates
-RUN rustup component add clippy rustfmt
 RUN cargo install cargo-watch just
+RUN rustup component add rustfmt clippy
 
 WORKDIR /lyonkit-api
 
-COPY ./ .\
+COPY . .
 
-RUN cargo build && cargo test --no-run
+RUN cargo build && cargo test -p server --no-run
 
 ENV PORT=8080
 EXPOSE $PORT
