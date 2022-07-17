@@ -9,17 +9,11 @@ pub enum Patch<T> {
 
 impl<T> Patch<T> {
   pub fn is_null(&self) -> bool {
-    match self {
-      Patch::Null => true,
-      _ => false,
-    }
+    matches!(self, Patch::Null)
   }
 
   pub fn is_missing(&self) -> bool {
-    match self {
-      Patch::Missing => true,
-      _ => false,
-    }
+    matches!(self, Patch::Missing)
   }
 }
 
