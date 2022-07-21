@@ -1,10 +1,10 @@
+use crate::pick_unused_port::{pick_unused_port, release_port};
 use crate::utils;
 use async_trait::async_trait;
 use aws_sdk_s3::Client;
 use getset::{Getters, Setters};
 use migration::{Migrator, MigratorTrait};
 use once_cell::sync::Lazy as SyncLazy;
-use portpicker::pick_unused_port;
 use reqwest::Method;
 use sea_orm::{ActiveModelTrait, ActiveValue, ConnectionTrait, DatabaseConnection};
 use serde::Serialize;
@@ -174,6 +174,8 @@ impl TestApp {
       .expect("Failed to drop database");
 
     utils::wipe_bucket(&self.s3_client, self.settings().s3().buckets().image()).await;
+
+    release_port(self.port);
   }
 }
 
@@ -271,7 +273,7 @@ pub async fn spawn_app() -> TestApp {
     url.to_string()
   };
 
-  let port = pick_unused_port().expect("No available port");
+  let port = pick_unused_port();
   let s3_bucket = format!("test{}", Uuid::new_v4().to_string().replace('-', ""));
   let settings = Settings::new(
     String::from("test"),

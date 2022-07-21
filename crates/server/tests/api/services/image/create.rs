@@ -1,6 +1,6 @@
-use crate::helpers::TestApp;
 use crate::services;
 use crate::services::image::assert_image_output;
+use crate::test_app::TestApp;
 use reqwest::multipart;
 use reqwest::{Response, StatusCode};
 use serde_json::Value;

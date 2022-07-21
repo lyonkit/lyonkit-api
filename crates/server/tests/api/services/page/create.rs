@@ -1,4 +1,4 @@
-use crate::helpers::TestApp;
+use crate::test_app::TestApp;
 use reqwest::StatusCode;
 use serde_json::{json, Map, Value};
 use std::collections::HashSet;

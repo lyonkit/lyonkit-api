@@ -107,13 +107,7 @@ async fn compress_and_upload(
     })
     .unwrap_or_else(|| "unknown".to_string());
 
-  let key = format!(
-    "{}__{}{}.{}",
-    id,
-    file_stem,
-    if lazy { "__lazy" } else { "" },
-    "jpeg"
-  );
+  let key = format!("{id}__{file_stem}{}.jpeg", if lazy { "__lazy" } else { "" },);
 
   s3.put_object()
     .bucket(bucket.to_string())
