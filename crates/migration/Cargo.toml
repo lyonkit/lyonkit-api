@@ -12,7 +12,7 @@ path = "src/lib.rs"
 [dependencies]
 entity = { path = "../entity" }
 sea-orm-migration = { version = "0.9.1", features = ["sqlx-postgres", "runtime-tokio-native-tls"] }
-chrono = "0.4.20"
+chrono = "0.4.21"
 tracing = "0.1.36"
 tracing-subscriber = "0.3.15"
 tokio = { version = "1.20.1", features = ["macros"] }
