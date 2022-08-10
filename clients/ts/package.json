@@ -14,11 +14,11 @@
     "ufo": "^0.8.5"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "0.26.0",
+    "@antfu/eslint-config": "0.26.1",
     "eslint": "8.21.0",
     "standard-version": "^9.5.0",
     "typescript": "4.7.4",
-    "unbuild": "0.7.6",
+    "unbuild": "0.8.7",
     "vitest": "0.21.1"
   },
   "types": "./dist/index.d.ts",
@@ -35,6 +35,6 @@
   "packageManager": "pnpm@7.9.0",
   "volta": {
     "node": "16.16.0",
-    "npm": "8.16.0"
+    "npm": "8.17.0"
   }
 }
