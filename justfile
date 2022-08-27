@@ -33,7 +33,7 @@ migrate +args:
     just migration run -- {{args}}
 
 test *args:
-    just server test {{args}}
+    just run cargo nextest run -p server {{args}}
 
 wipe:
     just stop || echo ""

@@ -4,6 +4,7 @@ RUN apt update && apt install -y nodejs npm
 RUN npm i -g npm bunyan
 RUN update-ca-certificates
 RUN cargo install cargo-watch just
+RUN curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
 
 WORKDIR /lyonkit-api
 
