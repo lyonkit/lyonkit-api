@@ -3,3 +3,4 @@ mod image;
 mod page;
 mod ping;
 mod post;
+mod quote;

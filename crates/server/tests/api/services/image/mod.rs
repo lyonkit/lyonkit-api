@@ -82,7 +82,7 @@ pub(crate) fn assert_image_output(json: &Value) -> (Url, Url) {
     .expect("Public URL should have a path")
     .ends_with(".jpeg"));
 
-  return (root_image_url, lazy_image_url);
+  (root_image_url, lazy_image_url)
 }
 
 pub(crate) async fn download_file(url: &Url) -> String {

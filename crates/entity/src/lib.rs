@@ -4,3 +4,4 @@ pub mod image;
 pub mod namespace;
 pub mod page;
 pub mod post;
+pub mod quote;

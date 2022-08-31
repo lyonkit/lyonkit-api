@@ -15,10 +15,10 @@ stop:
     docker compose down
 
 run *args:
-    docker compose run -e TEST_LOG={{test_log}} -e S3__BASE_URL=http://s3:9000 server {{args}}
+    docker compose exec -e TEST_LOG={{test_log}} -e S3__BASE_URL=http://s3:9000 server {{args}}
 
 db +args:
-    docker compose run postgres {{args}}
+    docker compose exec postgres {{args}}
 
 server script *args:
     just run cargo {{script}} -p server {{args}}

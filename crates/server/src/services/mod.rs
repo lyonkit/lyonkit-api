@@ -2,10 +2,12 @@ mod blok;
 mod image;
 mod page;
 mod post;
+mod quote;
 
 use crate::middlewares::s3::S3ProviderMiddlewareFactory;
 use crate::services::image::image_service;
 use crate::services::post::post_service;
+use crate::services::quote::quote_service;
 use crate::{
   middlewares::api_key::ApiKeyMiddlewareFactory,
   services::{blok::blok_service, page::page_service},
@@ -49,4 +51,5 @@ pub fn api_services() -> Scope<
     .service(blok_service())
     .service(image_service())
     .service(post_service())
+    .service(quote_service())
 }

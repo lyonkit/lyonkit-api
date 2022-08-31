@@ -8,6 +8,7 @@ mod m20220517_000004_create_bloks_table;
 mod m20220610_000005_create_images_table;
 mod m20220610_000006_create_posts_table;
 mod m20220716_000007_fix_blok_priority_trigger;
+mod m20220831_000008_create_blok_table;
 pub(crate) mod utils;
 
 pub struct Migrator;
@@ -23,6 +24,7 @@ impl MigratorTrait for Migrator {
       Box::new(m20220610_000005_create_images_table::Migration),
       Box::new(m20220610_000006_create_posts_table::Migration),
       Box::new(m20220716_000007_fix_blok_priority_trigger::Migration),
+      Box::new(m20220831_000008_create_blok_table::Migration),
     ]
   }
 }
