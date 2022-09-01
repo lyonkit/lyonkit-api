@@ -94,8 +94,8 @@ jobs:
         env:
           NEXTEST_TEST_THREADS: 1
         with:
-          actions: actions-rs/cargo@v1
-          with:
+          action: actions-rs/cargo@v1
+          with: |
             command: nextest
             args: run --all
           attempt_limit: 3
