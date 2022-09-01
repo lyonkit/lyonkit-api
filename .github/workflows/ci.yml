@@ -91,6 +91,8 @@ jobs:
       - uses: taiki-e/install-action@nextest
       - name: Test
         uses: actions-rs/cargo@v1
+        env:
+          NEXTEST_TEST_THREADS: 1
         with:
           command: nextest
           args: run --all
