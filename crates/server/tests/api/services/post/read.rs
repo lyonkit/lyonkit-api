@@ -15,6 +15,7 @@ async fn get_one_post_should_work(ctx: &mut TestApp) {
     &json!({
       "title": "My first article",
       "description": "Article description",
+      "slug": "first-article",
       "body": {
         "...": "..."
       }
@@ -41,6 +42,7 @@ async fn get_one_post_should_work(ctx: &mut TestApp) {
       "namespace",
       "title",
       "description",
+      "slug",
       "body",
       "createdAt",
       "updatedAt"
@@ -51,6 +53,7 @@ async fn get_one_post_should_work(ctx: &mut TestApp) {
   assert_eq!(post.get("namespace"), json.get("namespace"));
   assert_eq!(post.get("title"), json.get("title"));
   assert_eq!(post.get("description"), json.get("description"));
+  assert_eq!(post.get("slug"), json.get("slug"));
   assert_eq!(post.get("json"), json.get("json"));
   assert!(json.get("id").and_then(|v| v.as_i64()).is_some());
   assert!(json.get("createdAt").and_then(|v| v.as_str()).is_some());
@@ -67,6 +70,7 @@ async fn get_one_post_from_another_namespace_should_be_denied(ctx: &mut TestApp)
     &json!({
       "title": "My first article",
       "description": "Article description",
+      "slug": "first-article",
       "body": {
         "...": "..."
       }

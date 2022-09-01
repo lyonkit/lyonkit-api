@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 pub struct PostInput {
   title: String,
   description: Option<String>,
+  slug: String,
   body: serde_json::Value,
 }
 
@@ -17,6 +18,7 @@ impl PostInput {
     post::ActiveModel {
       title: Set(self.title.to_owned()),
       description: Set(self.description.to_owned()),
+      slug: Set(self.slug.to_owned()),
       body: Set(self.body.to_owned()),
       ..Default::default()
     }
@@ -29,6 +31,7 @@ pub struct PostOutput {
   id: i32,
   title: String,
   description: Option<String>,
+  slug: String,
   namespace: String,
   body: serde_json::Value,
   created_at: DateTime<Utc>,
@@ -44,6 +47,7 @@ impl TryFrom<post::ActiveModel> for PostOutput {
       namespace: try_unwrap_active_value(model.namespace)?,
       title: try_unwrap_active_value(model.title)?,
       description: try_unwrap_active_value(model.description)?,
+      slug: try_unwrap_active_value(model.slug)?,
       body: try_unwrap_active_value(model.body)?,
       created_at: try_unwrap_active_value(model.created_at)?,
       updated_at: try_unwrap_active_value(model.updated_at)?,
@@ -58,6 +62,7 @@ impl From<post::Model> for PostOutput {
       namespace: model.namespace,
       title: model.title,
       description: model.description,
+      slug: model.slug,
       body: model.body,
       created_at: model.created_at,
       updated_at: model.updated_at,

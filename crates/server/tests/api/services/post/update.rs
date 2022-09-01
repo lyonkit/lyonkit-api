@@ -15,6 +15,7 @@ async fn update_valid_post_should_work(ctx: &mut TestApp) {
     &json!({
       "title": "My first article",
       "description": "Article description",
+      "slug": "first-article",
       "body": {
         "...": "..."
       }
@@ -28,6 +29,7 @@ async fn update_valid_post_should_work(ctx: &mut TestApp) {
       &json!({
         "title": "My second article",
         "description": "Other article description",
+        "slug": "second-article",
         "body": {
           "other": "value"
         }
@@ -50,6 +52,7 @@ async fn update_valid_post_should_work(ctx: &mut TestApp) {
       "namespace",
       "title",
       "description",
+      "slug",
       "body",
       "createdAt",
       "updatedAt"

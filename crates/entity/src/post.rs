@@ -13,6 +13,8 @@ pub struct Model {
   pub title: String,
   #[sea_orm(column_type = "Text")]
   pub description: Option<String>,
+  #[sea_orm(column_type = "Text", unique)]
+  pub slug: String,
   pub body: Json,
   pub created_at: DateTimeUtc,
   pub updated_at: DateTimeUtc,

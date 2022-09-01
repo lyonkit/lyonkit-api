@@ -20,6 +20,7 @@ pub async fn create_post(app: &TestApp, body: &Value) -> Map<String, Value> {
       "namespace",
       "title",
       "description",
+      "slug",
       "body",
       "createdAt",
       "updatedAt"
@@ -28,6 +29,7 @@ pub async fn create_post(app: &TestApp, body: &Value) -> Map<String, Value> {
   );
   assert_eq!(body.get("title"), json.get("title"));
   assert_eq!(body.get("description"), json.get("description"));
+  assert_eq!(body.get("slug"), json.get("slug"));
   assert_eq!(body.get("body"), json.get("body"));
   assert!(json.get("id").and_then(|v| v.as_i64()).is_some());
   assert!(json.get("createdAt").and_then(|v| v.as_str()).is_some());
@@ -48,6 +50,7 @@ async fn create_valid_post_should_work(ctx: &mut TestApp) {
     &json!({
       "title": "My first article",
       "description": "Article description",
+      "slug": "first-article",
       "body": {
         "...": "..."
       }

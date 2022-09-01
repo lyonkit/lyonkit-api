@@ -65,14 +65,29 @@ export interface BlokOutput {
 export interface PostInput {
   title: string,
   description: string,
+  slug: string,
   body: any,
 }
 export interface PostOutput {
   id: number,
   title: string,
   description: string | null,
+  slug: string,
   namespace: string,
   body: any,
+  created_at: string,
+  updated_at: string,
+}
+
+export interface QuoteInput {
+  author: string,
+  message: string,
+}
+export interface QuoteOutput {
+  id: number,
+  namespace: string,
+  author: string,
+  message: string,
   created_at: string,
   updated_at: string,
 }
@@ -119,12 +134,18 @@ export class LyonkitReadonlyApiClient {
 
   // POSTS
 
-  public async listPosts(): Promise<PostOutput> {
+  public async listPosts(): Promise<PostOutput[]> {
     return this.fetch('/post')
   }
 
   public async getPost(postId: number): Promise<PostOutput> {
     return this.fetch(`/post/${postId}`)
+  }
+
+  // QUOTES
+
+  public async listQuotes(): Promise<QuoteOutput[]> {
+    return this.fetch('/quote')
   }
 }
 
@@ -185,5 +206,19 @@ export class LyonkitWriteApiClient extends LyonkitReadonlyApiClient {
 
   public async deletePost(postId: number): Promise<PostOutput> {
     return this.fetch(`/post/${postId}`, { method: 'DELETE' })
+  }
+
+  // QUOTE
+
+  public async createQuote(quote: QuoteInput): Promise<QuoteOutput> {
+    return this.fetch('/quote', { method: 'POST', body: quote })
+  }
+
+  public async updateQuote({ quoteId, update }: { quoteId: number; update: QuoteInput }): Promise<QuoteOutput> {
+    return this.fetch(`/quote/${quoteId}`, { method: 'PUT', body: update })
+  }
+
+  public async deleteQuote(postId: number): Promise<QuoteOutput> {
+    return this.fetch(`/quote/${postId}`, { method: 'DELETE' })
   }
 }

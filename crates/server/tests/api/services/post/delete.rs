@@ -14,6 +14,7 @@ async fn delete_post_works(ctx: &mut TestApp) {
     &json!({
       "title": "My first article",
       "description": "Article description",
+      "slug": "first-article",
       "body": {
         "...": "..."
       }
@@ -38,6 +39,7 @@ async fn delete_post_from_other_namespace_should_be_denied(ctx: &mut TestApp) {
     &json!({
       "title": "My first article",
       "description": "Article description",
+      "slug": "first-article",
       "body": {
         "...": "..."
       }
