@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/leo91000/lyonkit-api/compare/v1.4.1...v1.5.0) (2022-09-01)
+
+
+### Features
+
+* Added quotes ([0462481](https://github.com/leo91000/lyonkit-api/commit/04624815308c800ed2547e9566bd23ab787be7ca))
+* Added slug column to posts ([03cf974](https://github.com/leo91000/lyonkit-api/commit/03cf974b3a00878d3be8619739c9768c1942632d))
+
 ### [1.4.1](https://github.com/leo91000/lyonkit-api/compare/v1.4.0...v1.4.1) (2022-07-16)
 
 ## [1.4.0](https://github.com/leo91000/lyonkit-api/compare/v1.3.0...v1.4.0) (2022-07-16)
