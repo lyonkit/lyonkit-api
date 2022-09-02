@@ -1,13 +1,13 @@
 mod blok;
-mod image;
 mod git_json_file;
+mod image;
 mod page;
 mod post;
 mod quote;
 
 use crate::middlewares::s3::S3ProviderMiddlewareFactory;
+use crate::services::git_json_file::git_json_file_service;
 use crate::services::image::image_service;
-use crate::services::git_json_file::{git_json_file_service};
 use crate::services::post::post_service;
 use crate::services::quote::quote_service;
 use crate::{
