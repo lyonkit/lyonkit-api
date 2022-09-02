@@ -38,10 +38,28 @@ pub async fn get_post(
 ) -> Result<HttpResponse, ActixError> {
   let id = path_id.into_inner();
 
-  // Page must exists to be replaced
   let post = Entity::find()
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
     .filter(Column::Id.eq(id))
+    .one(data.conn())
+    .await
+    .map_err(db_err_into_api_err)?
+    .ok_or(ApiError::NotFound)?;
+
+  Ok(HttpResponse::Ok().json(PostOutput::from(post)))
+}
+
+#[get("/s/{slug}")]
+pub async fn get_post_by_slug(
+  data: web::Data<AppState>,
+  path_slug: web::Path<String>,
+  api_key: WriteApiKey,
+) -> Result<HttpResponse, ActixError> {
+  let slug = path_slug.into_inner();
+
+  let post = Entity::find()
+    .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
+    .filter(Column::Slug.eq(slug))
     .one(data.conn())
     .await
     .map_err(db_err_into_api_err)?

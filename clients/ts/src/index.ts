@@ -147,6 +147,10 @@ export class LyonkitReadonlyApiClient {
     return this.fetch(`/post/${postId}`)
   }
 
+  public async getPostBySlug(postSlug: string): Promise<PostOutput> {
+    return this.fetch(`/post/s/${postSlug}`)
+  }
+
   // QUOTES
 
   public async listQuotes(): Promise<QuoteOutput[]> {
