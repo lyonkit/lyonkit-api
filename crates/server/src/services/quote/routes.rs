@@ -29,6 +29,25 @@ pub async fn list_quotes(
   )
 }
 
+#[get("/{id}")]
+pub async fn get_quote(
+  data: web::Data<AppState>,
+  api_key: ApiKey,
+  path_id: web::Path<i32>,
+) -> Result<HttpResponse, ActixError> {
+  let id = path_id.into_inner();
+
+  let quote: Model = Entity::find()
+    .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
+    .filter(Column::Id.eq(id))
+    .one(data.conn())
+    .await
+    .map_err(db_err_into_api_err)?
+    .ok_or(ApiError::NotFound)?;
+
+  Ok(HttpResponse::Ok().json(QuoteOutput::from(quote)))
+}
+
 #[post("")]
 pub async fn create_quote(
   data: web::Data<AppState>,

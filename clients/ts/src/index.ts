@@ -156,6 +156,10 @@ export class LyonkitReadonlyApiClient {
   public async listQuotes(): Promise<QuoteOutput[]> {
     return this.fetch('/quote')
   }
+
+  public async getQuote(quoteId: number): Promise<PostOutput> {
+    return this.fetch(`/quote/${quoteId}`)
+  }
 }
 
 export class LyonkitWriteApiClient extends LyonkitReadonlyApiClient {

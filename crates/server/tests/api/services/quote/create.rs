@@ -5,7 +5,6 @@ use test_context::test_context;
 
 pub async fn create_quote(app: &TestApp, body: &Value) -> Map<String, Value> {
   let response = app.post("/quote", body).await;
-  dbg!(&body);
   assert!(response.status().is_success());
 
   let json = response
