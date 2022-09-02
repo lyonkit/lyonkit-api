@@ -33,6 +33,9 @@ pub enum ApiError {
   InternalServerError,
   PatchNotNullable(String),
   PatchAtLeastOneField,
+  GitError,
+  GitTokenMissing,
+  GitBodyUnparseable,
 }
 
 impl Display for ApiError {
@@ -41,7 +44,7 @@ impl Display for ApiError {
       ApiError::ApiKeyNotProvided => write!(f, "ApiKeyError: API key was not provided"),
       ApiError::ApiKeyInvalid => write!(f, "ApiKeyError: Invalid API key"),
       ApiError::ApiKeyReadOnly => write!(f, "ApiKeyError: This API key is readonly"),
-      ApiError::DbError | ApiError::DbDeserializeError => write!(f, "Internal Server Error"),
+      ApiError::DbError | ApiError::DbDeserializeError | ApiError::GitError | ApiError::GitBodyUnparseable | ApiError::GitTokenMissing => write!(f, "Internal Server Error"),
       ApiError::NotFound => write!(f, "Not found"),
       ApiError::ReferenceNotFound(reference) => {
         write!(f, "Reference to \"{}\" not found", reference)
@@ -83,6 +86,9 @@ impl ApiErrorTrait for ApiError {
       ApiError::InternalServerError => String::from("INTSE"),
       ApiError::PatchNotNullable(_) => String::from("PTHNN"),
       ApiError::PatchAtLeastOneField => String::from("PTHOF"),
+      ApiError::GitError => String::from("GITER"),
+      ApiError::GitBodyUnparseable => String::from("GITBU"),
+      ApiError::GitTokenMissing => String::from("GITTM"),
     }
   }
 

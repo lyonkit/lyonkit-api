@@ -92,6 +92,11 @@ export interface QuoteOutput {
   updated_at: string,
 }
 
+interface GitJsonFileUpdate {
+  key: string,
+  update: string
+}
+
 export class LyonkitReadonlyApiClient {
   public readonly endpoint: string = 'https://lyonkit.leo-coletta.fr'
   protected readonly apiKey: string
@@ -220,5 +225,17 @@ export class LyonkitWriteApiClient extends LyonkitReadonlyApiClient {
 
   public async deleteQuote(postId: number): Promise<QuoteOutput> {
     return this.fetch(`/quote/${postId}`, { method: 'DELETE' })
+  }
+
+  // GIT JSON FILE
+  public async getGitJsonFile<T = any>(path: string): Promise<T> {
+    return this.fetch(`/git/json-file/${path}`)
+  }
+
+  public async updateGitJsonFile<T = any>(path: string, update: GitJsonFileUpdate): Promise<T> {
+    return this.fetch(`/git/json-file/${path}`, {
+      method: 'PUT',
+      body: update
+    })
   }
 }
