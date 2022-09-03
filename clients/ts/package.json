@@ -2,7 +2,19 @@
   "name": "@leo91000/lyonkit-client",
   "version": "1.9.0",
   "private": false,
+  "packageManager": "pnpm@7.9.5",
   "author": "Léo Coletta <contact@leo-coletta.fr>",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    },
+    "./*": "./*"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "unbuild",
     "release": "pnpm build && standard-version && git push --follow-tags && pnpm publish",
@@ -21,18 +33,6 @@
     "unbuild": "0.8.10",
     "vitest": "0.22.1"
   },
-  "types": "./dist/index.d.ts",
-  "sideEffects": false,
-  "exports": {
-    ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
-    },
-    "./*": "./*"
-  },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "packageManager": "pnpm@7.9.5",
   "volta": {
     "node": "16.17.0",
     "npm": "8.19.1"

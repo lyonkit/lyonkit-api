@@ -1,4 +1,3 @@
-import type { $Fetch } from 'ohmyfetch'
 import { $fetch } from 'ohmyfetch'
 import { joinURL } from 'ufo'
 
@@ -63,182 +62,213 @@ export interface BlokOutput {
 }
 
 export interface PostInput {
-  title: string,
-  description: string,
-  slug: string,
-  body: any,
+  title: string
+  description: string
+  slug: string
+  body: any
 }
 export interface PostOutput {
-  id: number,
-  title: string,
-  description: string | null,
-  slug: string,
-  namespace: string,
-  body: any,
-  created_at: string,
-  updated_at: string,
+  id: number
+  title: string
+  description: string | null
+  slug: string
+  namespace: string
+  body: any
+  created_at: string
+  updated_at: string
 }
 
 export interface QuoteInput {
-  author: string,
-  message: string,
+  author: string
+  message: string
 }
 export interface QuoteOutput {
-  id: number,
-  namespace: string,
-  author: string,
-  message: string,
-  created_at: string,
-  updated_at: string,
+  id: number
+  namespace: string
+  author: string
+  message: string
+  created_at: string
+  updated_at: string
 }
 
-export class LyonkitReadonlyApiClient {
-  public readonly endpoint: string = 'https://lyonkit.leo-coletta.fr'
-  protected readonly apiKey: string
-  protected readonly fetch: $Fetch
+export * from './class'
 
-  constructor(params: { endpoint?: string; apiKey: string }) {
-    if (params.endpoint)
-      this.endpoint = params.endpoint
+interface LyonkitClientOptions { endpoint?: string; apiKey: string }
 
-    this.apiKey = params.apiKey
-    this.fetch = $fetch.create({
-      baseURL: joinURL(this.endpoint, '/api'),
-      headers: {
-        'x-api-key': this.apiKey,
-      },
-    })
-  }
+export function createLyonkitReadonlyApiClient({ endpoint = 'https://lyonkit.leo-coletta.fr', apiKey }: LyonkitClientOptions) {
+  const fetchClient = $fetch.create({
+    baseURL: joinURL(endpoint, '/api'),
+    headers: {
+      'x-api-key': apiKey,
+    },
+  })
 
   // IMAGES
 
-  public async listImages(): Promise<ImageOutput[]> {
-    return this.fetch('/image')
+  async function listImages(): Promise<ImageOutput[]> {
+    return fetchClient('/image')
   }
 
   // PAGES
 
-  public async listPages(): Promise<PageOutput[]> {
-    return this.fetch('/page')
+  async function listPages(): Promise<PageOutput[]> {
+    return fetchClient('/page')
   }
 
-  public async getPage(path: string): Promise<PageOutputWithBloks> {
-    return this.fetch(`/page/wb${path}`)
+  async function getPage(path: string): Promise<PageOutputWithBloks> {
+    return fetchClient(`/page/wb${path}`)
   }
 
   // BLOKS
 
-  public async getBlok(blokId: number): Promise<BlokOutput> {
-    return this.fetch(`/blok/${blokId}`)
+  async function getBlok(blokId: number): Promise<BlokOutput> {
+    return fetchClient(`/blok/${blokId}`)
   }
 
   // POSTS
 
-  public async listPosts(): Promise<PostOutput[]> {
-    return this.fetch('/post')
+  async function listPosts(): Promise<PostOutput[]> {
+    return fetchClient('/post')
   }
 
-  public async getPost(postId: number): Promise<PostOutput> {
-    return this.fetch(`/post/${postId}`)
+  async function getPost(postId: number): Promise<PostOutput> {
+    return fetchClient(`/post/${postId}`)
   }
 
-  public async getPostBySlug(postSlug: string): Promise<PostOutput> {
-    return this.fetch(`/post/s/${postSlug}`)
+  async function getPostBySlug(postSlug: string): Promise<PostOutput> {
+    return fetchClient(`/post/s/${postSlug}`)
   }
 
   // QUOTES
 
-  public async listQuotes(): Promise<QuoteOutput[]> {
-    return this.fetch('/quote')
+  async function listQuotes(): Promise<QuoteOutput[]> {
+    return fetchClient('/quote')
   }
 
-  public async getQuote(quoteId: number): Promise<PostOutput> {
-    return this.fetch(`/quote/${quoteId}`)
+  async function getQuote(quoteId: number): Promise<PostOutput> {
+    return fetchClient(`/quote/${quoteId}`)
+  }
+
+  return {
+    fetchClient,
+    listImages,
+    listPages,
+    getPage,
+    getBlok,
+    listPosts,
+    getPost,
+    getPostBySlug,
+    listQuotes,
+    getQuote,
   }
 }
 
-export class LyonkitWriteApiClient extends LyonkitReadonlyApiClient {
+export function createLyonkitWriteApiClient(options: LyonkitClientOptions) {
+  const { fetchClient, ...readonlyMethods } = createLyonkitReadonlyApiClient(options)
+
   // IMAGES
 
-  public async createImage({ image, alt }: ImageInput): Promise<ImageOutput> {
+  async function createImage({ image, alt }: ImageInput): Promise<ImageOutput> {
     const form = new FormData()
     form.set('image', image)
-    return this.fetch('/image', { params: { alt }, method: 'POST', body: form })
+    return fetchClient('/image', { params: { alt }, method: 'POST', body: form })
   }
 
-  public async deleteImage(imageId: number): Promise<ImageOutput> {
-    return this.fetch(`/image/${imageId}`, { method: 'DELETE' })
+  async function deleteImage(imageId: number): Promise<ImageOutput> {
+    return fetchClient(`/image/${imageId}`, { method: 'DELETE' })
   }
 
   // PAGES
 
-  public async createPage(page: PageInput): Promise<PageOutput> {
-    return this.fetch('/page', { method: 'POST', body: page })
+  async function createPage(page: PageInput): Promise<PageOutput> {
+    return fetchClient('/page', { method: 'POST', body: page })
   }
 
-  public async updatePage({ pageId, update }: { pageId: number; update: PageInput }): Promise<PageOutput> {
-    return this.fetch(`/page/${pageId}`, { method: 'PUT', body: update })
+  async function updatePage({ pageId, update }: { pageId: number; update: PageInput }): Promise<PageOutput> {
+    return fetchClient(`/page/${pageId}`, { method: 'PUT', body: update })
   }
 
-  public async deletePage(pageId: number): Promise<PageOutput> {
-    return this.fetch(`/page/${pageId}`, { method: 'DELETE' })
+  async function deletePage(pageId: number): Promise<PageOutput> {
+    return fetchClient(`/page/${pageId}`, { method: 'DELETE' })
   }
 
   // BLOKS
 
-  public async createBlok(blok: BlokInput): Promise<BlokOutput> {
-    return this.fetch('/blok', { method: 'POST', body: blok })
+  async function createBlok(blok: BlokInput): Promise<BlokOutput> {
+    return fetchClient('/blok', { method: 'POST', body: blok })
   }
 
-  public async updateBlok({ blokId, update }: { blokId: number; update: BlokInput }): Promise<BlokOutput> {
-    return this.fetch(`/blok/${blokId}`, { method: 'PUT', body: update })
+  async function updateBlok({ blokId, update }: { blokId: number; update: BlokInput }): Promise<BlokOutput> {
+    return fetchClient(`/blok/${blokId}`, { method: 'PUT', body: update })
   }
 
-  public async patchBlok({ blokId, patch }: { blokId: number; patch: BlokPatchInput }): Promise<BlokOutput> {
-    return this.fetch(`/blok/${blokId}`, { method: 'PATCH', body: patch })
+  async function patchBlok({ blokId, patch }: { blokId: number; patch: BlokPatchInput }): Promise<BlokOutput> {
+    return fetchClient(`/blok/${blokId}`, { method: 'PATCH', body: patch })
   }
 
-  public async deleteBlok(blokId: number): Promise<BlokOutput> {
-    return this.fetch(`/blok/${blokId}`, { method: 'DELETE' })
+  async function deleteBlok(blokId: number): Promise<BlokOutput> {
+    return fetchClient(`/blok/${blokId}`, { method: 'DELETE' })
   }
 
   // POST
 
-  public async createPost(post: PostInput): Promise<PostOutput> {
-    return this.fetch('/post', { method: 'POST', body: post })
+  async function createPost(post: PostInput): Promise<PostOutput> {
+    return fetchClient('/post', { method: 'POST', body: post })
   }
 
-  public async updatePost({ postId, update }: { postId: number; update: PostInput }): Promise<PostOutput> {
-    return this.fetch(`/post/${postId}`, { method: 'PUT', body: update })
+  async function updatePost({ postId, update }: { postId: number; update: PostInput }): Promise<PostOutput> {
+    return fetchClient(`/post/${postId}`, { method: 'PUT', body: update })
   }
 
-  public async deletePost(postId: number): Promise<PostOutput> {
-    return this.fetch(`/post/${postId}`, { method: 'DELETE' })
+  async function deletePost(postId: number): Promise<PostOutput> {
+    return fetchClient(`/post/${postId}`, { method: 'DELETE' })
   }
 
   // QUOTE
 
-  public async createQuote(quote: QuoteInput): Promise<QuoteOutput> {
-    return this.fetch('/quote', { method: 'POST', body: quote })
+  async function createQuote(quote: QuoteInput): Promise<QuoteOutput> {
+    return fetchClient('/quote', { method: 'POST', body: quote })
   }
 
-  public async updateQuote({ quoteId, update }: { quoteId: number; update: QuoteInput }): Promise<QuoteOutput> {
-    return this.fetch(`/quote/${quoteId}`, { method: 'PUT', body: update })
+  async function updateQuote({ quoteId, update }: { quoteId: number; update: QuoteInput }): Promise<QuoteOutput> {
+    return fetchClient(`/quote/${quoteId}`, { method: 'PUT', body: update })
   }
 
-  public async deleteQuote(postId: number): Promise<QuoteOutput> {
-    return this.fetch(`/quote/${postId}`, { method: 'DELETE' })
+  async function deleteQuote(postId: number): Promise<QuoteOutput> {
+    return fetchClient(`/quote/${postId}`, { method: 'DELETE' })
   }
 
   // GIT JSON FILE
-  public async getGitJsonFile<T = any>(path: string): Promise<T> {
-    return this.fetch(`/git/json-file/${path}`)
+  async function getGitJsonFile<T = any>(path: string): Promise<T> {
+    return fetchClient(`/git/json-file/${path}`)
   }
 
-  public async updateGitJsonFile<T = any, U = any>(path: string, update: U): Promise<T> {
-    return this.fetch(`/git/json-file/${path}`, {
+  async function updateGitJsonFile<T = any, U = any>(path: string, update: U): Promise<T> {
+    return fetchClient(`/git/json-file/${path}`, {
       method: 'PUT',
-      body: update
+      body: update,
     })
+  }
+
+  return {
+    fetchClient,
+    ...readonlyMethods,
+    createImage,
+    deleteImage,
+    createPage,
+    updatePage,
+    deletePage,
+    createBlok,
+    updateBlok,
+    patchBlok,
+    deleteBlok,
+    createPost,
+    updatePost,
+    deletePost,
+    createQuote,
+    updateQuote,
+    deleteQuote,
+    getGitJsonFile,
+    updateGitJsonFile,
   }
 }
