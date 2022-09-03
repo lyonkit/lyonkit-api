@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/leo91000/lyonkit-api/compare/v1.8.0...v1.9.0) (2022-09-03)
+
+
+### Features
+
+* Make update git json file update the whole file instead of just single keys ([a4e1267](https://github.com/leo91000/lyonkit-api/commit/a4e1267bff7de2374e569088b1ee8c8ff5bf98b1))
+
 ## [1.8.0](https://github.com/leo91000/lyonkit-api/compare/v1.7.0...v1.8.0) (2022-09-02)
 
 
