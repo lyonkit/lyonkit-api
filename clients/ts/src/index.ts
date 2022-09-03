@@ -1,3 +1,4 @@
+import type { $Fetch } from 'ohmyfetch'
 import { $fetch } from 'ohmyfetch'
 import { joinURL } from 'ufo'
 
@@ -96,7 +97,7 @@ export * from './class'
 interface LyonkitClientOptions { endpoint?: string; apiKey: string }
 
 export function createLyonkitReadonlyApiClient({ endpoint = 'https://lyonkit.leo-coletta.fr', apiKey }: LyonkitClientOptions) {
-  const fetchClient = $fetch.create({
+  const fetchClient: $Fetch = $fetch.create({
     baseURL: joinURL(endpoint, '/api'),
     headers: {
       'x-api-key': apiKey,
