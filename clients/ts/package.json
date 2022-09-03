@@ -1,6 +1,6 @@
 {
   "name": "@leo91000/lyonkit-client",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "private": false,
   "packageManager": "pnpm@7.9.5",
   "author": "Léo Coletta <contact@leo-coletta.fr>",
