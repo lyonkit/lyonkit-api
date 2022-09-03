@@ -3,7 +3,7 @@ use crate::errors::utils::db_err_into_api_err;
 use crate::errors::ApiError;
 use crate::middlewares::api_key::WriteApiKey;
 use crate::server::AppState;
-use crate::services::git_json_file::models::{GitCommitPayloadBuilder, GitJsonFileUpdate};
+use crate::services::git_json_file::models::GitCommitPayloadBuilder;
 use crate::services::git_json_file::services::GITHUB_CLIENT;
 use actix_web::{get, put, web, Error as ActixError, HttpResponse};
 use entity::git_auth::{Column, Entity};
@@ -57,7 +57,7 @@ pub async fn get_git_json_file(
 pub async fn update_git_json_file(
   app_data: web::Data<AppState>,
   path: web::Path<String>,
-  body: web::Json<GitJsonFileUpdate>,
+  body: web::Json<serde_json::Value>,
   api_key: WriteApiKey,
 ) -> Result<HttpResponse, ActixError> {
   // On récupère le git auth associé à la clé d'API
@@ -88,27 +88,9 @@ pub async fn update_git_json_file(
   let content =
     fetch_git_json_file(&inner_path, api_key.namespace(), org, repo, github_token).await?;
 
-  let path_value = serde_json_lodash::get(
-    content.content().clone(),
-    serde_json::Value::String(body.key().clone()),
-    serde_json::Value::Null,
-  );
-
-  if path_value == serde_json::Value::Null {
-    return Err(ApiError::NotFound.into());
-  }
-
-  let updated_content = serde_json_lodash::set(
-    content.content().clone(),
-    serde_json::Value::String(body.key().clone()),
-    serde_json::Value::String(body.update().clone()),
-  );
-
+  let updated_content = body.into_inner();
   let commit = GitCommitPayloadBuilder::default()
-    .content(base64::encode(format!(
-      "{}\n",
-      serde_json::to_string_pretty(&updated_content).unwrap()
-    )))
+    .content(base64::encode(format!("{:#}\n", &updated_content)))
     .message(format!("chore: API update of {inner_path}"))
     .branch("main".to_string())
     .sha(content.sha().clone())

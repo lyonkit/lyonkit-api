@@ -3176,15 +3176,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_json_lodash"
-version = "0.1.16"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "acd12e84339ca74ca48086c9d5f293f6299b6500f0a2fb907c92768a3ac44ece"
-dependencies = [
- "serde_json",
-]
-
-[[package]]
 name = "serde_urlencoded"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3232,7 +3223,6 @@ dependencies = [
  "sea-orm",
  "serde",
  "serde_json",
- "serde_json_lodash",
  "test-context",
  "tokio",
  "tokio-util",

@@ -92,11 +92,6 @@ export interface QuoteOutput {
   updated_at: string,
 }
 
-interface GitJsonFileUpdate {
-  key: string,
-  update: string
-}
-
 export class LyonkitReadonlyApiClient {
   public readonly endpoint: string = 'https://lyonkit.leo-coletta.fr'
   protected readonly apiKey: string
@@ -240,7 +235,7 @@ export class LyonkitWriteApiClient extends LyonkitReadonlyApiClient {
     return this.fetch(`/git/json-file/${path}`)
   }
 
-  public async updateGitJsonFile<T = any>(path: string, update: GitJsonFileUpdate): Promise<T> {
+  public async updateGitJsonFile<T = any, U = any>(path: string, update: U): Promise<T> {
     return this.fetch(`/git/json-file/${path}`, {
       method: 'PUT',
       body: update
