@@ -146,7 +146,7 @@ export function createLyonkitReadonlyApiClient({ endpoint = 'https://lyonkit.leo
     return fetchClient('/quote')
   }
 
-  async function getQuote(quoteId: number): Promise<PostOutput> {
+  async function getQuote(quoteId: number): Promise<QuoteOutput> {
     return fetchClient(`/quote/${quoteId}`)
   }
 
