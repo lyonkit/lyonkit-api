@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.5](https://github.com/leo91000/lyonkit-api/compare/v1.9.4...v1.9.5) (2022-09-04)
+
+
+### Bug Fixes
+
+* Fix `getQuote` type ([2609e01](https://github.com/leo91000/lyonkit-api/commit/2609e01d603acf39054061307667730c7fe96029))
+
 ### [1.9.4](https://github.com/leo91000/lyonkit-api/compare/v1.9.3...v1.9.4) (2022-09-03)
 
 ### [1.9.3](https://github.com/leo91000/lyonkit-api/compare/v1.9.2...v1.9.3) (2022-09-03)
