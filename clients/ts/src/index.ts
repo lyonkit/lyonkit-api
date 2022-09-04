@@ -75,8 +75,8 @@ export interface PostOutput {
   slug: string
   namespace: string
   body: any
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface QuoteInput {
@@ -88,8 +88,8 @@ export interface QuoteOutput {
   namespace: string
   author: string
   message: string
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
 }
 
 export * from './class'
