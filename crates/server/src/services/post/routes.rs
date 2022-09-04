@@ -34,7 +34,7 @@ pub async fn list_posts(
 pub async fn get_post(
   data: web::Data<AppState>,
   path_id: web::Path<i32>,
-  api_key: WriteApiKey,
+  api_key: ApiKey,
 ) -> Result<HttpResponse, ActixError> {
   let id = path_id.into_inner();
 
@@ -53,7 +53,7 @@ pub async fn get_post(
 pub async fn get_post_by_slug(
   data: web::Data<AppState>,
   path_slug: web::Path<String>,
-  api_key: WriteApiKey,
+  api_key: ApiKey,
 ) -> Result<HttpResponse, ActixError> {
   let slug = path_slug.into_inner();
 
