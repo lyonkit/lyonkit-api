@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.9.6](https://github.com/leo91000/lyonkit-api/compare/v1.9.5...v1.9.6) (2022-09-04)
+
+
+### Bug Fixes
+
+* Fix snake case key in TS client ([2851a2b](https://github.com/leo91000/lyonkit-api/commit/2851a2b11ab56df186882f9cc0aed7d62493f9a2))
+
 ### [1.9.5](https://github.com/leo91000/lyonkit-api/compare/v1.9.4...v1.9.5) (2022-09-04)
 
 
