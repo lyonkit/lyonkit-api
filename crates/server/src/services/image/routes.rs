@@ -75,7 +75,12 @@ async fn compress_and_upload(
 ) -> Result<String, ApiError> {
   let p_filename = Path::new(filename.as_str());
 
-  let image = image.resize_to_fill(width, height, filter);
+  let resize = image.width() > width || image.height() > height;
+  let image = image.resize_to_fill(
+    if resize { width } else { image.width() },
+    if resize { height } else { image.height() },
+    filter,
+  );
 
   let image = {
     let mut image_output: Vec<u8> = Vec::new();
