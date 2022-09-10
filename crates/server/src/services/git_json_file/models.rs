@@ -1,6 +1,6 @@
-use derive_builder::Builder;
 use getset::{Getters, Setters};
 use serde::{Deserialize, Serialize};
+use typed_builder::TypedBuilder;
 
 #[derive(Getters, Setters, Deserialize, Serialize)]
 #[getset(get = "pub", set = "pub")]
@@ -9,7 +9,7 @@ pub struct GitJsonFile {
   content: serde_json::Value,
 }
 
-#[derive(Getters, Deserialize, Serialize, Builder)]
+#[derive(Getters, Deserialize, Serialize, TypedBuilder)]
 #[getset(get = "pub")]
 pub struct GitCommitPayload {
   message: String,

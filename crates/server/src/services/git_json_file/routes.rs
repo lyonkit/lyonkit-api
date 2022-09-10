@@ -3,7 +3,7 @@ use crate::errors::utils::db_err_into_api_err;
 use crate::errors::ApiError;
 use crate::middlewares::api_key::WriteApiKey;
 use crate::server::AppState;
-use crate::services::git_json_file::models::GitCommitPayloadBuilder;
+use crate::services::git_json_file::models::GitCommitPayload;
 use crate::services::git_json_file::services::GITHUB_CLIENT;
 use actix_web::{get, put, web, Error as ActixError, HttpResponse};
 use entity::git_auth::{Column, Entity};
@@ -89,13 +89,12 @@ pub async fn update_git_json_file(
     fetch_git_json_file(&inner_path, api_key.namespace(), org, repo, github_token).await?;
 
   let updated_content = body.into_inner();
-  let commit = GitCommitPayloadBuilder::default()
+  let commit = GitCommitPayload::builder()
     .content(base64::encode(format!("{:#}\n", &updated_content)))
     .message(format!("chore: API update of {inner_path}"))
     .branch("main".to_string())
     .sha(content.sha().clone())
-    .build()
-    .unwrap();
+    .build();
 
   let url = format!("https://api.github.com/repos/{org}/{repo}/contents/{inner_path}");
   let response = GITHUB_CLIENT
