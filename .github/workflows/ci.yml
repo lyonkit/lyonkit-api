@@ -12,7 +12,7 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: self-hosted
 
     timeout-minutes: 10
 
