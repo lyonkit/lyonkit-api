@@ -92,8 +92,6 @@ export interface QuoteOutput {
   updatedAt: string
 }
 
-export * from './class'
-
 interface LyonkitClientOptions { endpoint?: string; apiKey: string }
 
 export function createLyonkitReadonlyApiClient({ endpoint = 'https://lyonkit.leo-coletta.fr', apiKey }: LyonkitClientOptions) {
