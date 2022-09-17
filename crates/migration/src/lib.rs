@@ -12,6 +12,7 @@ mod m20220831_000008_create_blok_table;
 mod m20220901_000009_add_slug_column_to_posts;
 mod m20220901_000010_create_git_auths_table;
 mod m20220917_000011_fix_blok_priority_trigger;
+mod m20220917_000012_fix_blok_priority_trigger;
 pub(crate) mod utils;
 
 pub struct Migrator;
@@ -31,6 +32,7 @@ impl MigratorTrait for Migrator {
       Box::new(m20220901_000009_add_slug_column_to_posts::Migration),
       Box::new(m20220901_000010_create_git_auths_table::Migration),
       Box::new(m20220917_000011_fix_blok_priority_trigger::Migration),
+      Box::new(m20220917_000012_fix_blok_priority_trigger::Migration),
     ]
   }
 }

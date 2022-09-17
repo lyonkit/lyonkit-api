@@ -78,9 +78,9 @@ jobs:
           profile: minimal
           toolchain: stable
           components: rustfmt, clippy
-      - uses: Swatinem/rust-cache@v1
-        with:
-          key: v1 # increment this to bust the cache if needed
+#      - uses: Swatinem/rust-cache@v1
+#        with:
+#          key: v1 # increment this to bust the cache if needed
       - name: Rustfmt
         run: cargo fmt --all -- --check
       - name: Clippy
