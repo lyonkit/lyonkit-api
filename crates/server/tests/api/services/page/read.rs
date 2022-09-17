@@ -173,7 +173,7 @@ async fn get_page_with_bloks_read_only_api_key_should_work(ctx: &mut TestApp) {
     .expect("Expected bloks array in response");
   assert_eq!(2, json_bloks.len());
   assert_eq!(
-    vec![2, 1],
+    vec![1, 0],
     json_bloks
       .iter()
       .map(|v| v
@@ -183,7 +183,7 @@ async fn get_page_with_bloks_read_only_api_key_should_work(ctx: &mut TestApp) {
       .collect::<Vec<i64>>()
   );
   assert_eq!(
-    vec!["Paragraph", "Hero"],
+    vec!["Hero", "Paragraph"],
     json_bloks
       .iter()
       .map(|v| v
