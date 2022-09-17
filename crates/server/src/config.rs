@@ -5,13 +5,17 @@ use aws_types::region::Region;
 use aws_types::Credentials;
 use config::Environment;
 pub use config::{Config, ConfigError};
+use console::style;
 use derive_more::Constructor;
 use getset::Getters;
+use lazy_static::lazy_static;
 use once_cell::sync::Lazy as SyncLazy;
+use regex::Regex;
 use serde::Deserialize;
+use struct_field_names_as_array::FieldNamesAsArray;
 use url::Url;
 
-#[derive(Deserialize, Getters, Constructor, Clone, Debug)]
+#[derive(Deserialize, Getters, Constructor, Clone, Debug, FieldNamesAsArray)]
 #[getset(get = "pub")]
 pub struct Settings {
   app_name: String,
@@ -23,7 +27,7 @@ pub struct Settings {
   cors: Vec<String>,
 }
 
-#[derive(Deserialize, Getters, Constructor, Clone, Debug)]
+#[derive(Deserialize, Getters, Constructor, Clone, Debug, FieldNamesAsArray)]
 #[getset(get = "pub")]
 pub struct S3Config {
   endpoint: String,
@@ -134,5 +138,41 @@ impl Settings {
   }
 }
 
-pub static SETTINGS: SyncLazy<Settings> =
-  SyncLazy::new(|| Settings::from_env().expect("Invalid configuration, check for missing env"));
+lazy_static! {
+  static ref MISSING_FIELD_RE: Regex = Regex::new("missing field `([A-Za-z0-9_]*)`").unwrap();
+}
+
+pub static SETTINGS: SyncLazy<Settings> = SyncLazy::new(|| match Settings::from_env() {
+  Ok(settings) => return settings,
+  Err(e) => {
+    while let Err(ConfigError::Message(msg)) = &Settings::from_env() {
+      if let Some(caps) = MISSING_FIELD_RE.captures(msg) {
+        if let Some(re_match) = caps.get(1) {
+          let field = re_match.as_str();
+          let mut env_var = String::from("");
+
+          if Settings::FIELD_NAMES_AS_ARRAY.contains(&field) {
+            env_var = field.to_uppercase();
+          } else if "credentials" == field {
+            env_var =
+              String::from("S3__CREDENTIALS__ACCESS_KEY_ID | S3__CREDENTIALS__SECRET_ACCESS_KEY");
+            std::env::set_var("S3__CREDENTIALS__ACCESS_KEY_ID", "FOO");
+            std::env::set_var("S3__CREDENTIALS__SECRET_ACCESS_KEY", "FOO");
+          } else if S3Config::FIELD_NAMES_AS_ARRAY.contains(&field) {
+            env_var = format!("S3__{}", field.to_uppercase());
+          }
+
+          println!(
+            "{}: Missing environnement variable {}",
+            style("ERROR").red().bold(),
+            style(&env_var).yellow().underlined()
+          );
+
+          std::env::set_var(env_var, "FOO");
+        }
+      }
+    }
+
+    panic!("An error occured while parsing config from env : {:?}", e);
+  }
+});
