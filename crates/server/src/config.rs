@@ -94,7 +94,7 @@ impl Settings {
       .set_default("host", "0.0.0.0")?
       .set_default("telemetry", false)?
       .set_default("s3.buckets.image", "lyonkit-images")?
-      .set_default("cors", Vec::new() as Vec<String>)?
+      .set_default("cors", Vec::<String>::new())?
       .add_source(
         Environment::default()
           .try_parsing(true)
