@@ -73,7 +73,7 @@ impl Server {
           Method::DELETE,
         ])
         .allowed_headers(&[
-          HeaderName::try_from("X-Api-Key").unwrap(),
+          HeaderName::from_static("x-api-key"),
           ORIGIN,
           CONTENT_TYPE,
           CONTENT_DISPOSITION,
