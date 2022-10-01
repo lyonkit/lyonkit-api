@@ -1,3 +1,4 @@
+use crate::errors::utils::MapApiError;
 use crate::middlewares::api_key::ApiKey;
 pub use crate::{
   errors::{utils::db_err_into_api_err, ApiError},
@@ -18,7 +19,7 @@ pub async fn list_posts(
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
     .all(data.conn())
     .await
-    .map_err(db_err_into_api_err)?;
+    .map_api_err()?;
 
   Ok(
     HttpResponse::Ok().json(
@@ -43,7 +44,7 @@ pub async fn get_post(
     .filter(Column::Id.eq(id))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .ok_or(ApiError::NotFound)?;
 
   Ok(HttpResponse::Ok().json(PostOutput::from(post)))
@@ -62,7 +63,7 @@ pub async fn get_post_by_slug(
     .filter(Column::Slug.eq(slug))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .ok_or(ApiError::NotFound)?;
 
   Ok(HttpResponse::Ok().json(PostOutput::from(post)))
@@ -81,7 +82,7 @@ pub async fn create_post(
     model
       .save(data.conn())
       .await
-      .map_err(db_err_into_api_err)
+      .map_api_err()
       .and_then(|model| Ok(HttpResponse::Ok().json(PostOutput::try_from(model)?)))?,
   )
 }
@@ -101,7 +102,7 @@ pub async fn update_post(
     .filter(Column::Id.eq(id))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .ok_or(ApiError::NotFound)?;
 
   let mut model = body.active_model();
@@ -112,7 +113,7 @@ pub async fn update_post(
     model
       .save(data.conn())
       .await
-      .map_err(db_err_into_api_err)
+      .map_api_err()
       .and_then(|model| Ok(HttpResponse::Ok().json(PostOutput::try_from(model)?)))?,
   )
 }
@@ -130,14 +131,10 @@ pub async fn delete_post(
     .filter(Column::Id.eq(id))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .ok_or(ApiError::NotFound)?;
 
-  post
-    .clone()
-    .delete(data.conn())
-    .await
-    .map_err(db_err_into_api_err)?;
+  post.clone().delete(data.conn()).await.map_api_err()?;
 
   Ok(HttpResponse::Ok().json(PostOutput::from(post)))
 }

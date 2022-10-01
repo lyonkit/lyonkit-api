@@ -47,9 +47,9 @@ pub(crate) async fn fetch_git_json_file(
     .content()
     .as_str()
     .map(|c| c.to_string())
-    .ok_or("no content field".to_string())
+    .ok_or_else(|| "no content field".to_string())
     .and_then(|b64_content| {
-      decode_b64(b64_content.replace("\n", "")).map_err(|err| format!("{:?}", err))
+      decode_b64(b64_content.replace('\n', "")).map_err(|err| format!("{:?}", err))
     })
     .and_then(|bytes| {
       serde_json::from_slice::<serde_json::Value>(bytes.as_slice())

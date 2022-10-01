@@ -1,3 +1,4 @@
+use crate::errors::utils::MapApiError;
 use crate::middlewares::api_key::ApiKey;
 use crate::services::page::models::PageOutputWithBloks;
 pub use crate::{
@@ -8,7 +9,7 @@ pub use crate::{
 };
 use actix_web::{delete, get, post, put, web, Error as ActixError, HttpResponse};
 use entity::page::{Column, Entity, Model};
-use sea_orm::{prelude::*, ActiveValue::Set, Order};
+use sea_orm::{prelude::*, ActiveValue::Set, Order, QueryOrder};
 
 #[get("")]
 pub async fn list_pages(
@@ -19,7 +20,7 @@ pub async fn list_pages(
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
     .all(data.conn())
     .await
-    .map_err(db_err_into_api_err)?;
+    .map_api_err()?;
 
   Ok(
     HttpResponse::Ok().json(
@@ -39,12 +40,12 @@ pub async fn get_page_with_blok(
 ) -> Result<HttpResponse, ActixError> {
   let path = format!("/{}", path);
 
-  let mut q = Entity::find()
+  let q = Entity::find()
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
     .filter(Column::Path.eq(path.as_str()))
-    .find_with_related(entity::blok::Entity);
-  sea_orm::QueryTrait::query(&mut q).order_by(entity::blok::Column::Priority, Order::Desc);
-  let result = q.all(data.conn()).await.map_err(db_err_into_api_err)?;
+    .find_with_related(entity::blok::Entity)
+    .order_by(entity::blok::Column::Priority, Order::Desc);
+  let result = q.all(data.conn()).await.map_api_err()?;
 
   let result: &(Model, Vec<entity::blok::Model>) = result.get(0).ok_or(ApiError::NotFound)?;
 
@@ -64,7 +65,7 @@ pub async fn create_page(
     model
       .save(data.conn())
       .await
-      .map_err(db_err_into_api_err)
+      .map_api_err()
       .and_then(|model| Ok(HttpResponse::Ok().json(PageOutput::try_from(model)?)))?,
   )
 }
@@ -84,7 +85,7 @@ pub async fn update_page(
     .filter(Column::Id.eq(id))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .ok_or(ApiError::NotFound)?;
 
   let mut model = body.active_model();
@@ -95,7 +96,7 @@ pub async fn update_page(
     model
       .save(data.conn())
       .await
-      .map_err(db_err_into_api_err)
+      .map_api_err()
       .and_then(|model| Ok(HttpResponse::Ok().json(PageOutput::try_from(model)?)))?,
   )
 }
@@ -113,14 +114,10 @@ pub async fn delete_page(
     .filter(Column::Id.eq(id))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .ok_or(ApiError::NotFound)?;
 
-  page
-    .clone()
-    .delete(data.conn())
-    .await
-    .map_err(db_err_into_api_err)?;
+  page.clone().delete(data.conn()).await.map_api_err()?;
 
   Ok(HttpResponse::Ok().json(PageOutput::from(page)))
 }

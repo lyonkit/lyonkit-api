@@ -6,7 +6,7 @@ pub struct EditableFiles(Vec<String>);
 
 impl EditableFiles {
   pub fn inner(&self) -> &Vec<String> {
-    return &self.0;
+    &self.0
   }
 }
 

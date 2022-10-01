@@ -1,12 +1,9 @@
 use super::models::{BlokInput, BlokOutput};
+use crate::errors::utils::MapApiError;
 use crate::middlewares::api_key::ApiKey;
 use crate::services::blok::models::BlokPatchInput;
 use crate::utils::serde_json_patch::Patch::Value;
-use crate::{
-  errors::{utils::db_err_into_api_err, ApiError},
-  middlewares::api_key::WriteApiKey,
-  server::AppState,
-};
+use crate::{errors::ApiError, middlewares::api_key::WriteApiKey, server::AppState};
 use actix_web::{delete, get, patch, post, put, web, Error as ActixError, HttpResponse};
 use entity::blok::{Column, Entity, Model};
 use entity::page::{Column as PageColumn, Entity as PageEntity};
@@ -27,7 +24,7 @@ pub async fn get_blok(
     .filter(Column::Id.eq(id))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .and_then(|(blok, page)| page.map(|p| (blok, p)))
     .and_then(|(blok, page)| {
       if &page.namespace == api_key.namespace() {
@@ -53,14 +50,14 @@ pub async fn create_blok(
     .filter(PageColumn::Id.eq(*body.page_id()))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .ok_or_else(|| ApiError::ReferenceNotFound("pageId".to_string()))?;
 
   Ok(
     model
       .save(data.conn())
       .await
-      .map_err(db_err_into_api_err)
+      .map_api_err()
       .and_then(|model| Ok(HttpResponse::Ok().json(BlokOutput::try_from(model)?)))?,
   )
 }
@@ -79,7 +76,7 @@ pub async fn update_blok(
     .filter(Column::Id.eq(id))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .and_then(|(blok, page)| page.map(|p| (blok, p)))
     .and_then(|(blok, page)| {
       if &page.namespace == api_key.namespace() {
@@ -94,7 +91,7 @@ pub async fn update_blok(
     .filter(PageColumn::Id.eq(*body.page_id()))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .ok_or_else(|| ApiError::ReferenceNotFound("pageId".to_string()))?;
 
   let mut model = body.active_model();
@@ -104,7 +101,7 @@ pub async fn update_blok(
     model
       .save(data.conn())
       .await
-      .map_err(db_err_into_api_err)
+      .map_api_err()
       .and_then(|model| Ok(HttpResponse::Ok().json(BlokOutput::try_from(model)?)))?,
   )
 }
@@ -147,7 +144,7 @@ pub async fn patch_blok(
     .filter(Column::Id.eq(id))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .and_then(|(blok, page)| page.map(|p| (blok, p)))
     .and_then(|(blok, page)| {
       if &page.namespace == api_key.namespace() {
@@ -164,7 +161,7 @@ pub async fn patch_blok(
       .filter(PageColumn::Id.eq(*page_id))
       .one(data.conn())
       .await
-      .map_err(db_err_into_api_err)?
+      .map_api_err()?
       .ok_or_else(|| ApiError::ReferenceNotFound("pageId".to_string()))?;
 
     blok.page_id = Set(*page_id);
@@ -188,7 +185,7 @@ pub async fn patch_blok(
     blok
       .save(data.conn())
       .await
-      .map_err(db_err_into_api_err)
+      .map_api_err()
       .and_then(|model| Ok(HttpResponse::Ok().json(BlokOutput::try_from(model)?)))?,
   )
 }
@@ -206,7 +203,7 @@ pub async fn delete_blok(
     .filter(Column::Id.eq(id))
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .and_then(|(blok, page)| page.map(|p| (blok, p)))
     .and_then(|(blok, page)| {
       if &page.namespace == api_key.namespace() {
@@ -216,11 +213,7 @@ pub async fn delete_blok(
     })
     .ok_or(ApiError::NotFound)?;
 
-  blok
-    .clone()
-    .delete(data.conn())
-    .await
-    .map_err(db_err_into_api_err)?;
+  blok.clone().delete(data.conn()).await.map_api_err()?;
 
   Ok(HttpResponse::Ok().json(BlokOutput::from(blok)))
 }

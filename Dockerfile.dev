@@ -15,4 +15,4 @@ RUN cargo build && cargo test -p server --no-run
 ENV PORT=8080
 EXPOSE $PORT
 
-CMD cargo-watch -s 'cargo run | bunyan'
+CMD cargo-watch -s 'cargo run'

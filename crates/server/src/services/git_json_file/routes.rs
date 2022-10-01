@@ -1,5 +1,5 @@
 use super::services::fetch_git_json_file;
-use crate::errors::utils::db_err_into_api_err;
+use crate::errors::utils::MapApiError;
 use crate::errors::ApiError;
 use crate::middlewares::api_key::WriteApiKey;
 use crate::server::AppState;
@@ -21,7 +21,7 @@ pub async fn get_git_json_file(
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
     .one(app_data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .ok_or(ApiError::GitTokenMissing)?;
 
   let org = &git_auth.organisation;
@@ -65,7 +65,7 @@ pub async fn update_git_json_file(
     .filter(Column::Namespace.eq(api_key.namespace().to_owned()))
     .one(app_data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .ok_or(ApiError::GitTokenMissing)?;
 
   let org = &git_auth.organisation;

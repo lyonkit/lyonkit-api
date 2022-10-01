@@ -1,5 +1,5 @@
 use crate::config::Settings;
-use crate::errors::utils::db_err_into_api_err;
+use crate::errors::utils::MapApiError;
 use crate::errors::ApiError;
 use crate::middlewares::api_key::{ApiKey, WriteApiKey};
 use crate::middlewares::s3::{S3ClientExt, S3ClientProvider};
@@ -38,13 +38,7 @@ pub async fn list_images(
     .find_also_linked(LazyImageLink)
     .all(data.conn())
     .await
-    .map_err(|e| {
-      error!(
-        error_message = format!("{:?}", e).as_str(),
-        "An error occured while listing image"
-      );
-      ApiError::DbError
-    })?
+    .map_api_err()?
     .iter()
     .map(|(img, lz_img_opt): &(Model, Option<Model>)| {
       ImageOutput::from((
@@ -284,7 +278,7 @@ pub async fn upload_image(
   }
   .save(data.conn())
   .await
-  .map_err(db_err_into_api_err)?;
+  .map_api_err()?;
 
   let image = entity::image::ActiveModel {
     namespace: Set(api_key.namespace().to_string()),
@@ -295,7 +289,7 @@ pub async fn upload_image(
   }
   .save(data.conn())
   .await
-  .map_err(db_err_into_api_err)?;
+  .map_api_err()?;
 
   Ok(HttpResponse::Ok().json(ImageOutput::try_from((s3_bucket, image, image_lazy))?))
 }
@@ -316,15 +310,11 @@ pub async fn delete_image(
     .find_also_linked(LazyImageLink)
     .one(data.conn())
     .await
-    .map_err(db_err_into_api_err)?
+    .map_api_err()?
     .and_then(|(img, lz_img_opt): (Model, Option<Model>)| lz_img_opt.map(|lz_img| (img, lz_img)))
     .ok_or(ApiError::NotFound)?;
 
-  image
-    .clone()
-    .delete(data.conn())
-    .await
-    .map_err(db_err_into_api_err)?;
+  image.clone().delete(data.conn()).await.map_api_err()?;
 
   Ok(HttpResponse::Ok().json(ImageOutput::from((
     Arc::new(settings.s3().buckets().image().clone()),

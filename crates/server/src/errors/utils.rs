@@ -2,6 +2,30 @@ use crate::errors::ApiError;
 use sea_orm::{ActiveValue, DbErr, Value};
 use tracing::error;
 
+pub trait IntoApiError {
+  fn into_api_err(self) -> ApiError;
+}
+
+pub trait MapApiError<T> {
+  fn map_api_err(self) -> Result<T, ApiError>;
+}
+
+impl IntoApiError for DbErr {
+  fn into_api_err(self) -> ApiError {
+    error!(
+      error_message = format!("{:?}", self).as_str(),
+      "An error occured while saving page"
+    );
+    ApiError::DbError
+  }
+}
+
+impl<T, E: IntoApiError> MapApiError<T> for Result<T, E> {
+  fn map_api_err(self) -> Result<T, ApiError> {
+    self.map_err(IntoApiError::into_api_err)
+  }
+}
+
 pub fn db_err_into_api_err(e: DbErr) -> ApiError {
   error!(
     error_message = format!("{:?}", e).as_str(),
