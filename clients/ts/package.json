@@ -2,7 +2,7 @@
   "name": "@leo91000/lyonkit-client",
   "version": "1.9.7",
   "private": false,
-  "packageManager": "pnpm@7.13.0",
+  "packageManager": "pnpm@7.13.1",
   "author": "Léo Coletta <contact@leo-coletta.fr>",
   "sideEffects": false,
   "exports": {
