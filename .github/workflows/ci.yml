@@ -12,14 +12,9 @@ on:
 
 jobs:
   test:
-    runs-on: self-hosted
-
     timeout-minutes: 10
 
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-      fail-fast: false
+    runs-on: ubuntu-22.04
 
     services:
       postgres:
