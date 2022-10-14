@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/leo91000/lyonkit-api/compare/v1.9.6...v1.10.0) (2022-10-14)
+
+
+### Features
+
+* Add locale ressource ([56599ca](https://github.com/leo91000/lyonkit-api/commit/56599ca41ad0baefef3aca99f64c421307d2fb23))
+
+
+### Bug Fixes
+
+* Fix priority trigger ([d609088](https://github.com/leo91000/lyonkit-api/commit/d60908816be5b79e73678789012581d25c5b290e))
+* Makes get post routes allow readonly api keys ([183257e](https://github.com/leo91000/lyonkit-api/commit/183257e5e16192960376563c51ccb054d57c8fa8))
+
 ### [1.9.7](https://github.com/leo91000/lyonkit-api/compare/v1.9.6...v1.9.7) (2022-09-17)
 
 
