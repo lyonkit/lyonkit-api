@@ -7,12 +7,12 @@ use serde_json::Value;
 #[serde(rename_all = "camelCase")]
 #[getset(get = "pub")]
 pub struct BlokPatchInput {
-  #[serde(default)]
-  page_id: Patch<i32>,
-  #[serde(default)]
-  component_id: Patch<String>,
-  #[serde(default)]
-  props: Patch<Value>,
-  #[serde(default)]
-  priority: Patch<i32>,
+    #[serde(default)]
+    page_id: Patch<i32>,
+    #[serde(default)]
+    component_id: Patch<String>,
+    #[serde(default)]
+    props: Patch<Value>,
+    #[serde(default)]
+    priority: Patch<i32>,
 }

@@ -4,4 +4,4 @@
 # imports_granularity = "Crate"
 use_field_init_shorthand = true
 # wrap_comments = true
-tab_spaces = 2
+tab_spaces = 4

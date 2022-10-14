@@ -2,8 +2,17 @@ set dotenv-load
 
 test_log := env_var_or_default("TEST_LOG", "false")
 
+local-start:
+  cargo run
+
+local-migrate *args:
+  cargo run -p migration -- {{args}}
+
+local-fmt:
+  cargo fmt --all
+
 build:
-    cargo build -p server --release
+    cargo build --release
 
 start:
     docker compose up -d
@@ -47,3 +56,6 @@ fmt:
 
 release:
     pnpm -C clients/ts run release && mv clients/ts/CHANGELOG.md CHANGELOG.md && git add . && git commit -m "chore: Update changelog" && git push
+
+service-start-s3:
+    docker run -e MINIO_ROOT_USER=lyonkit -e MINIO_ROOT_PASSWORD=lyonkit-s3-secret -p 9000:9000 -p 9001:9001 --name s3 --health-cmd "curl -f http://localhost:9000/minio/health/live" --health-interval 30s --health-retries 3 --health-timeout 20s -d bitnami/minio:latest

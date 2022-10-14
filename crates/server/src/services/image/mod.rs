@@ -6,8 +6,8 @@ mod models;
 mod routes;
 
 pub fn image_service() -> Scope {
-  scope("/image")
-    .service(list_images)
-    .service(upload_image)
-    .service(delete_image)
+    scope("/image")
+        .service(list_images)
+        .service(upload_image)
+        .service(delete_image)
 }

@@ -4,17 +4,17 @@ use sea_orm_migration::{prelude::*, MigrationName};
 pub struct Migration;
 
 impl MigrationName for Migration {
-  fn name(&self) -> &str {
-    "m20220917_000011_fix_blok_priority_trigger"
-  }
+    fn name(&self) -> &str {
+        "m20220917_000011_fix_blok_priority_trigger"
+    }
 }
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
-  async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-    exec_stmt!(
-      manager,
-      r#"
+    async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        exec_stmt!(
+            manager,
+            r#"
         create or replace function tg_bloks__set_priority() returns trigger as $$
           declare
             max_priority integer;
@@ -39,35 +39,35 @@ impl MigrationTrait for Migration {
           end;
         $$ language plpgsql volatile;
       "#
-    )?;
+        )?;
 
-    // Only execute trigger with one recursion limit
-    exec_stmt!(
-      manager,
-      "drop trigger if exists _500_set_display_priority on bloks;"
-    )?;
-    exec_stmt!(
-      manager,
-      r#"create trigger _500_set_display_priority before insert or update on bloks for each row when (pg_trigger_depth() = 0) execute procedure public.tg_bloks__set_priority();"#
-    )?;
+        // Only execute trigger with one recursion limit
+        exec_stmt!(
+            manager,
+            "drop trigger if exists _500_set_display_priority on bloks;"
+        )?;
+        exec_stmt!(
+            manager,
+            r#"create trigger _500_set_display_priority before insert or update on bloks for each row when (pg_trigger_depth() = 0) execute procedure public.tg_bloks__set_priority();"#
+        )?;
 
-    // Use constraint based uniqueness instead of index
-    exec_stmt!(
-      manager,
-      r#"drop index if exists bloks__page_id_priority__uniq_idx;"#
-    )?;
-    exec_stmt!(
-      manager,
-      r#"alter table bloks drop constraint if exists page_id_priority__uniq, add constraint page_id_priority__uniq unique (page_id, priority) deferrable initially immediate;"#
-    )?;
+        // Use constraint based uniqueness instead of index
+        exec_stmt!(
+            manager,
+            r#"drop index if exists bloks__page_id_priority__uniq_idx;"#
+        )?;
+        exec_stmt!(
+            manager,
+            r#"alter table bloks drop constraint if exists page_id_priority__uniq, add constraint page_id_priority__uniq unique (page_id, priority) deferrable initially immediate;"#
+        )?;
 
-    Ok(())
-  }
+        Ok(())
+    }
 
-  async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-    exec_stmt!(
-      manager,
-      r#"
+    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        exec_stmt!(
+            manager,
+            r#"
         create or replace function tg_bloks__set_priority() returns trigger as $$
           declare
             max_priority integer;
@@ -87,26 +87,26 @@ impl MigrationTrait for Migration {
           end;
         $$ language plpgsql volatile;
       "#
-    )?;
+        )?;
 
-    exec_stmt!(
-      manager,
-      "drop trigger if exists _500_set_display_priority on bloks;"
-    )?;
-    exec_stmt!(
-      manager,
-      r#"create trigger _500_set_display_priority before insert or update on bloks for each row execute procedure public.tg_bloks__set_priority();"#
-    )?;
+        exec_stmt!(
+            manager,
+            "drop trigger if exists _500_set_display_priority on bloks;"
+        )?;
+        exec_stmt!(
+            manager,
+            r#"create trigger _500_set_display_priority before insert or update on bloks for each row execute procedure public.tg_bloks__set_priority();"#
+        )?;
 
-    exec_stmt!(
-      manager,
-      "alter table bloks drop constraint if exists page_id_priority__uniq;"
-    )?;
-    exec_stmt!(
-      manager,
-      r#"create unique index if not exists bloks__page_id_priority__uniq_idx on bloks(page_id, priority);"#
-    )?;
+        exec_stmt!(
+            manager,
+            "alter table bloks drop constraint if exists page_id_priority__uniq;"
+        )?;
+        exec_stmt!(
+            manager,
+            r#"create unique index if not exists bloks__page_id_priority__uniq_idx on bloks(page_id, priority);"#
+        )?;
 
-    Ok(())
-  }
+        Ok(())
+    }
 }

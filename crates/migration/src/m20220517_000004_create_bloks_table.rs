@@ -5,21 +5,21 @@ use sea_orm_migration::{prelude::*, MigrationName, MigrationTrait, SchemaManager
 pub struct Migration;
 
 impl MigrationName for Migration {
-  fn name(&self) -> &str {
-    "m20220517_000003_create_bloks_table"
-  }
+    fn name(&self) -> &str {
+        "m20220517_000003_create_bloks_table"
+    }
 }
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
-  async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-    exec_stmt!(manager, r#"drop table if exists bloks"#)?;
-    create_table_from_entity!(manager, Entity)?;
+    async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        exec_stmt!(manager, r#"drop table if exists bloks"#)?;
+        create_table_from_entity!(manager, Entity)?;
 
-    // Set default value for created_at / updated_at columns and adds constraint
-    exec_stmt!(
-      manager,
-      r#"alter table bloks 
+        // Set default value for created_at / updated_at columns and adds constraint
+        exec_stmt!(
+            manager,
+            r#"alter table bloks 
          alter column created_at set default now(), 
          alter column updated_at set default now(), 
          alter column props type jsonb,
@@ -27,21 +27,21 @@ impl MigrationTrait for Migration {
          drop constraint if exists "fk-bloks-page_id",
          add constraint "fk-bloks-page_id" foreign key (page_id) references pages on update cascade on delete cascade
       "#
-    )?;
-    // Unique index on (page_id, priority)
-    exec_stmt!(
-      manager,
-      r#"create unique index bloks__page_id_priority__uniq_idx on bloks(page_id, priority);"#
-    )?;
+        )?;
+        // Unique index on (page_id, priority)
+        exec_stmt!(
+            manager,
+            r#"create unique index bloks__page_id_priority__uniq_idx on bloks(page_id, priority);"#
+        )?;
 
-    // Trigger to offset priority of other bloks
-    exec_stmt!(
-      manager,
-      r#"drop function if exists tg_bloks__set_priority()"#
-    )?;
-    exec_stmt!(
-      manager,
-      r#"
+        // Trigger to offset priority of other bloks
+        exec_stmt!(
+            manager,
+            r#"drop function if exists tg_bloks__set_priority()"#
+        )?;
+        exec_stmt!(
+            manager,
+            r#"
         create function tg_bloks__set_priority() returns trigger as $$
           declare
             max_priority integer;
@@ -59,29 +59,29 @@ impl MigrationTrait for Migration {
           end;
         $$ language plpgsql volatile;
       "#
-    )?;
-    exec_stmt!(
-      manager,
-      r#"create trigger _500_set_display_priority before insert or update on bloks for each row execute procedure public.tg_bloks__set_priority();"#
-    )?;
-    exec_stmt!(
-      manager,
-      r#"create trigger _100_timestamps before insert or update on bloks for each row execute procedure tg__timestamps();"#
-    )?;
+        )?;
+        exec_stmt!(
+            manager,
+            r#"create trigger _500_set_display_priority before insert or update on bloks for each row execute procedure public.tg_bloks__set_priority();"#
+        )?;
+        exec_stmt!(
+            manager,
+            r#"create trigger _100_timestamps before insert or update on bloks for each row execute procedure tg__timestamps();"#
+        )?;
 
-    Ok(())
-  }
+        Ok(())
+    }
 
-  async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-    manager
-      .drop_table(Table::drop().table(Entity).to_owned())
-      .await?;
+    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        manager
+            .drop_table(Table::drop().table(Entity).to_owned())
+            .await?;
 
-    exec_stmt!(
-      manager,
-      r#"drop function if exists tg_bloks__set_priority();"#
-    )?;
+        exec_stmt!(
+            manager,
+            r#"drop function if exists tg_bloks__set_priority();"#
+        )?;
 
-    Ok(())
-  }
+        Ok(())
+    }
 }

@@ -12,18 +12,18 @@ pub mod telemetry;
 mod utils;
 
 pub async fn main() -> io::Result<()> {
-  openssl_probe::init_ssl_cert_env_vars();
-  init_tracing();
+    openssl_probe::init_ssl_cert_env_vars();
+    init_tracing();
 
-  let server = Server::from_settings(&*SETTINGS)
-    .await
-    .migrate()
-    .await
-    .build()?;
+    let server = Server::from_settings(&*SETTINGS)
+        .await
+        .migrate()
+        .await
+        .build()?;
 
-  server.run_until_stopped().await.ok();
+    server.run_until_stopped().await?;
 
-  opentelemetry::global::shutdown_tracer_provider();
+    opentelemetry::global::shutdown_tracer_provider();
 
-  Ok(())
+    Ok(())
 }

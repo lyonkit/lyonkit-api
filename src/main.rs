@@ -6,5 +6,5 @@ static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
-  server::main().await
+    server::main().await
 }

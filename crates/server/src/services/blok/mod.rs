@@ -5,10 +5,10 @@ pub(crate) mod models;
 mod routes;
 
 pub fn blok_service() -> Scope {
-  scope("/blok")
-    .service(get_blok)
-    .service(create_blok)
-    .service(update_blok)
-    .service(patch_blok)
-    .service(delete_blok)
+    scope("/blok")
+        .service(get_blok)
+        .service(create_blok)
+        .service(update_blok)
+        .service(patch_blok)
+        .service(delete_blok)
 }

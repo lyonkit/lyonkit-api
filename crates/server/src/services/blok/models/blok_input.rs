@@ -9,20 +9,20 @@ use serde_json::Value;
 #[serde(rename_all = "camelCase")]
 #[getset(get = "pub")]
 pub struct BlokInput {
-  page_id: i32,
-  component_id: String,
-  props: Value,
-  priority: Option<i32>,
+    page_id: i32,
+    component_id: String,
+    props: Value,
+    priority: Option<i32>,
 }
 
 impl BlokInput {
-  pub fn active_model(&self) -> blok::ActiveModel {
-    blok::ActiveModel {
-      page_id: Set(self.page_id.to_owned()),
-      component_id: Set(self.component_id.to_owned()),
-      props: Set(self.props.to_owned()),
-      priority: self.priority.map(Set).unwrap_or(NotSet),
-      ..Default::default()
+    pub fn active_model(&self) -> blok::ActiveModel {
+        blok::ActiveModel {
+            page_id: Set(self.page_id.to_owned()),
+            component_id: Set(self.component_id.to_owned()),
+            props: Set(self.props.to_owned()),
+            priority: self.priority.map(Set).unwrap_or(NotSet),
+            ..Default::default()
+        }
     }
-  }
 }

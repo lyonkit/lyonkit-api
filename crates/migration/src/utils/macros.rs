@@ -15,13 +15,14 @@ macro_rules! exec_stmt {
 }
 
 macro_rules! create_table_from_entity {
-  ($manager: ident, $entity: ident) => {{
-    $manager
-      .create_table(
-        sea_orm::Schema::new($manager.get_database_backend()).create_table_from_entity($entity),
-      )
-      .await
-  }};
+    ($manager: ident, $entity: ident) => {{
+        $manager
+            .create_table(
+                sea_orm::Schema::new($manager.get_database_backend())
+                    .create_table_from_entity($entity),
+            )
+            .await
+    }};
 }
 
 pub(crate) use create_table_from_entity;

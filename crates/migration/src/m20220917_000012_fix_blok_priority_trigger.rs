@@ -4,17 +4,17 @@ use sea_orm_migration::{prelude::*, MigrationName};
 pub struct Migration;
 
 impl MigrationName for Migration {
-  fn name(&self) -> &str {
-    "m20220917_000012_fix_blok_priority_trigger"
-  }
+    fn name(&self) -> &str {
+        "m20220917_000012_fix_blok_priority_trigger"
+    }
 }
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
-  async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-    exec_stmt!(
-      manager,
-      r#"
+    async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        exec_stmt!(
+            manager,
+            r#"
         create or replace function tg_bloks__set_priority() returns trigger as $$
           declare
             max_priority integer;
@@ -39,15 +39,15 @@ impl MigrationTrait for Migration {
           end;
         $$ language plpgsql volatile;
       "#
-    )?;
+        )?;
 
-    Ok(())
-  }
+        Ok(())
+    }
 
-  async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-    exec_stmt!(
-      manager,
-      r#"
+    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        exec_stmt!(
+            manager,
+            r#"
         create or replace function tg_bloks__set_priority() returns trigger as $$
           declare
             max_priority integer;
@@ -72,8 +72,8 @@ impl MigrationTrait for Migration {
           end;
         $$ language plpgsql volatile;
       "#
-    )?;
+        )?;
 
-    Ok(())
-  }
+        Ok(())
+    }
 }

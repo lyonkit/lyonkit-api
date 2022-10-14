@@ -6,41 +6,41 @@ use serde_json::json;
 use std::fmt::{Debug, Display, Formatter};
 
 pub trait ApiErrorTrait: Display + Debug {
-  fn error_code(&self) -> String;
-  fn http_code(&self) -> StatusCode {
-    StatusCode::INTERNAL_SERVER_ERROR
-  }
-  fn http_response(&self) -> HttpResponse<BoxBody> {
-    HttpResponse::build(self.http_code()).json(json!({
-      "code": self.error_code(),
-      "message": format!("{}", self),
-    }))
-  }
+    fn error_code(&self) -> String;
+    fn http_code(&self) -> StatusCode {
+        StatusCode::INTERNAL_SERVER_ERROR
+    }
+    fn http_response(&self) -> HttpResponse<BoxBody> {
+        HttpResponse::build(self.http_code()).json(json!({
+          "code": self.error_code(),
+          "message": format!("{}", self),
+        }))
+    }
 }
 
 #[derive(Debug, Clone)]
 pub enum ApiError {
-  ApiKeyNotProvided,
-  ApiKeyInvalid,
-  ApiKeyReadOnly,
-  DbError,
-  DbDeserializeError,
-  NotFound,
-  ReferenceNotFound(String),
-  InvalidContentType(Vec<Mime>, Mime),
-  MissingField(String),
-  ImageNotDecodable,
-  InternalServerError,
-  PatchNotNullable(String),
-  PatchAtLeastOneField,
-  GitError,
-  GitTokenMissing,
-  GitBodyUnparseable,
+    ApiKeyNotProvided,
+    ApiKeyInvalid,
+    ApiKeyReadOnly,
+    DbError,
+    DbDeserializeError,
+    NotFound,
+    ReferenceNotFound(String),
+    InvalidContentType(Vec<Mime>, Mime),
+    MissingField(String),
+    ImageNotDecodable,
+    InternalServerError,
+    PatchNotNullable(String),
+    PatchAtLeastOneField,
+    GitError,
+    GitTokenMissing,
+    GitBodyUnparseable,
 }
 
 impl Display for ApiError {
-  fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-    match self {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
       ApiError::ApiKeyNotProvided => write!(f, "ApiKeyError: API key was not provided"),
       ApiError::ApiKeyInvalid => write!(f, "ApiKeyError: Invalid API key"),
       ApiError::ApiKeyReadOnly => write!(f, "ApiKeyError: This API key is readonly"),
@@ -67,49 +67,49 @@ impl Display for ApiError {
       ApiError::PatchNotNullable(field) => write!(f, "Field {field} is not nullable"),
       ApiError::PatchAtLeastOneField => write!(f, "You must patch at least one field"),
     }
-  }
+    }
 }
 
 impl ApiErrorTrait for ApiError {
-  fn error_code(&self) -> String {
-    match self {
-      ApiError::ApiKeyNotProvided => String::from("AKNPV"),
-      ApiError::ApiKeyInvalid => String::from("AKINV"),
-      ApiError::ApiKeyReadOnly => String::from("AKIRO"),
-      ApiError::DbError => String::from("DBERR"),
-      ApiError::DbDeserializeError => String::from("DBDSE"),
-      ApiError::NotFound => String::from("NTFND"),
-      ApiError::ReferenceNotFound(_) => String::from("REFNF"),
-      ApiError::InvalidContentType(_, _) => String::from("BADCT"),
-      ApiError::MissingField(_) => String::from("FLMIS"),
-      ApiError::ImageNotDecodable => String::from("IMGND"),
-      ApiError::InternalServerError => String::from("INTSE"),
-      ApiError::PatchNotNullable(_) => String::from("PTHNN"),
-      ApiError::PatchAtLeastOneField => String::from("PTHOF"),
-      ApiError::GitError => String::from("GITER"),
-      ApiError::GitBodyUnparseable => String::from("GITBU"),
-      ApiError::GitTokenMissing => String::from("GITTM"),
+    fn error_code(&self) -> String {
+        match self {
+            ApiError::ApiKeyNotProvided => String::from("AKNPV"),
+            ApiError::ApiKeyInvalid => String::from("AKINV"),
+            ApiError::ApiKeyReadOnly => String::from("AKIRO"),
+            ApiError::DbError => String::from("DBERR"),
+            ApiError::DbDeserializeError => String::from("DBDSE"),
+            ApiError::NotFound => String::from("NTFND"),
+            ApiError::ReferenceNotFound(_) => String::from("REFNF"),
+            ApiError::InvalidContentType(_, _) => String::from("BADCT"),
+            ApiError::MissingField(_) => String::from("FLMIS"),
+            ApiError::ImageNotDecodable => String::from("IMGND"),
+            ApiError::InternalServerError => String::from("INTSE"),
+            ApiError::PatchNotNullable(_) => String::from("PTHNN"),
+            ApiError::PatchAtLeastOneField => String::from("PTHOF"),
+            ApiError::GitError => String::from("GITER"),
+            ApiError::GitBodyUnparseable => String::from("GITBU"),
+            ApiError::GitTokenMissing => String::from("GITTM"),
+        }
     }
-  }
 
-  fn http_code(&self) -> StatusCode {
-    match self {
-      ApiError::ApiKeyNotProvided | ApiError::ApiKeyInvalid => StatusCode::FORBIDDEN,
-      ApiError::ApiKeyReadOnly => StatusCode::UNAUTHORIZED,
-      ApiError::NotFound => StatusCode::NOT_FOUND,
-      ApiError::ReferenceNotFound(_)
-      | ApiError::InvalidContentType(_, _)
-      | ApiError::PatchNotNullable(_)
-      | ApiError::PatchAtLeastOneField
-      | ApiError::MissingField(_) => StatusCode::BAD_REQUEST,
-      ApiError::ImageNotDecodable => StatusCode::UNPROCESSABLE_ENTITY,
-      _ => StatusCode::INTERNAL_SERVER_ERROR,
+    fn http_code(&self) -> StatusCode {
+        match self {
+            ApiError::ApiKeyNotProvided | ApiError::ApiKeyInvalid => StatusCode::FORBIDDEN,
+            ApiError::ApiKeyReadOnly => StatusCode::UNAUTHORIZED,
+            ApiError::NotFound => StatusCode::NOT_FOUND,
+            ApiError::ReferenceNotFound(_)
+            | ApiError::InvalidContentType(_, _)
+            | ApiError::PatchNotNullable(_)
+            | ApiError::PatchAtLeastOneField
+            | ApiError::MissingField(_) => StatusCode::BAD_REQUEST,
+            ApiError::ImageNotDecodable => StatusCode::UNPROCESSABLE_ENTITY,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
+        }
     }
-  }
 }
 
 impl ResponseError for ApiError {
-  fn error_response(&self) -> HttpResponse<BoxBody> {
-    self.http_response()
-  }
+    fn error_response(&self) -> HttpResponse<BoxBody> {
+        self.http_response()
+    }
 }

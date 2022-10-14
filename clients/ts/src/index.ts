@@ -92,6 +92,16 @@ export interface QuoteOutput {
   updatedAt: string
 }
 
+export type Locales = Record<string, any>
+
+export interface LocaleOutput {
+  id: number
+  namespace: string
+  lang: String
+  createdAt: String
+  updatedAt: String
+}
+
 interface LyonkitClientOptions { endpoint?: string; apiKey: string }
 
 export function createLyonkitReadonlyApiClient({ endpoint = 'https://lyonkit.leo-coletta.fr', apiKey }: LyonkitClientOptions) {
@@ -148,6 +158,11 @@ export function createLyonkitReadonlyApiClient({ endpoint = 'https://lyonkit.leo
     return fetchClient(`/quote/${quoteId}`)
   }
 
+  // LOCALES
+  async function getLocales(): Promise<Locales> {
+    return fetchClient('/locale')
+  }
+
   return {
     fetchClient,
     listImages,
@@ -159,6 +174,7 @@ export function createLyonkitReadonlyApiClient({ endpoint = 'https://lyonkit.leo
     getPostBySlug,
     listQuotes,
     getQuote,
+    getLocales,
   }
 }
 
@@ -249,6 +265,14 @@ export function createLyonkitWriteApiClient(options: LyonkitClientOptions) {
     })
   }
 
+  // LOCALES
+  async function updateLocale(lang: string, messages: any): Promise<LocaleOutput> {
+    return fetchClient(`/locale/${lang}`, {
+      method: 'PUT',
+      body: messages,
+    })
+  }
+
   return {
     fetchClient,
     ...readonlyMethods,
@@ -269,5 +293,6 @@ export function createLyonkitWriteApiClient(options: LyonkitClientOptions) {
     deleteQuote,
     getGitJsonFile,
     updateGitJsonFile,
+    updateLocale,
   }
 }
