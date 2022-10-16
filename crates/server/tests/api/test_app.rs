@@ -9,7 +9,7 @@ use reqwest::Method;
 use sea_orm::{ActiveModelTrait, ActiveValue, ConnectionTrait, DatabaseConnection};
 use serde::Serialize;
 use serde_json::json;
-use server::config::{S3Buckets, S3Config, S3Credentials};
+use server::config::{LogFormat, S3Buckets, S3Config, S3Credentials};
 use server::{
     config::Settings,
     server::Server,
@@ -291,6 +291,7 @@ pub async fn spawn_app() -> TestApp {
             S3Buckets::new(s3_bucket),
         ),
         Vec::new(),
+        LogFormat::Json,
     );
 
     let database_connection = configure_database(&settings).await;

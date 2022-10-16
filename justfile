@@ -11,6 +11,9 @@ local-migrate *args:
 local-fmt:
   cargo fmt --all
 
+local-test *args:
+    cargo nextest run -p server {{args}}
+
 build:
     cargo build --release
 
