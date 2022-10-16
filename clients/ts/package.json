@@ -2,7 +2,7 @@
   "name": "@leo91000/lyonkit-client",
   "version": "1.10.1",
   "private": false,
-  "packageManager": "pnpm@7.13.2",
+  "packageManager": "pnpm@7.13.4",
   "author": "Léo Coletta <contact@leo-coletta.fr>",
   "sideEffects": false,
   "exports": {
@@ -23,18 +23,18 @@
   },
   "dependencies": {
     "ohmyfetch": "^0.4.19",
-    "ufo": "^0.8.5"
+    "ufo": "^0.8.6"
   },
   "devDependencies": {
     "@antfu/eslint-config": "0.27.0",
     "eslint": "8.25.0",
     "standard-version": "^9.5.0",
     "typescript": "4.8.4",
-    "unbuild": "0.8.11",
-    "vitest": "0.24.0"
+    "unbuild": "0.9.4",
+    "vitest": "0.24.3"
   },
   "volta": {
-    "node": "16.17.1",
+    "node": "16.18.0",
     "npm": "8.19.2"
   }
 }
