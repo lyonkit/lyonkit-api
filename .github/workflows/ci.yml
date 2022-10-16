@@ -1,7 +1,5 @@
 name: Test
 
-runs-on: self-hosted
-
 on:
   push:
     branches:
@@ -14,9 +12,8 @@ on:
 
 jobs:
   test:
+    runs-on: self-hosted
     timeout-minutes: 10
-
-    runs-on: ubuntu-22.04
 
     services:
       postgres:
