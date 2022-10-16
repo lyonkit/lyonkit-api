@@ -14,6 +14,9 @@ local-fmt:
 local-test *args:
     cargo nextest run -p server {{args}}
 
+local-clippy:
+    cargo +nightly clippy --tests --benches --all-targets --all-features -- -D warnings
+
 build:
     cargo build --release
 
