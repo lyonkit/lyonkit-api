@@ -14,6 +14,7 @@ mod m20220901_000010_create_git_auths_table;
 mod m20220917_000011_fix_blok_priority_trigger;
 mod m20220917_000012_fix_blok_priority_trigger;
 mod m20221013_000013_create_locale_table;
+mod m20221023_000014_add_timestamps_to_locales_data;
 pub(crate) mod utils;
 
 pub struct Migrator;
@@ -35,6 +36,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20220917_000011_fix_blok_priority_trigger::Migration),
             Box::new(m20220917_000012_fix_blok_priority_trigger::Migration),
             Box::new(m20221013_000013_create_locale_table::Migration),
+            Box::new(m20221023_000014_add_timestamps_to_locales_data::Migration),
         ]
     }
 }

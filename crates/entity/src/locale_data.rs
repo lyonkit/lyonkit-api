@@ -10,6 +10,8 @@ pub struct Model {
     #[serde(skip_deserializing)]
     pub id: i32,
     pub messages: Json,
+    pub created_at: DateTimeUtc,
+    pub updated_at: DateTimeUtc,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
