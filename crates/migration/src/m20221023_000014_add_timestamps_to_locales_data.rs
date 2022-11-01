@@ -1,6 +1,4 @@
-use crate::utils::macros::{create_table_from_entity, exec_stmt};
-use entity::locale::Entity;
-use entity::locale_data::Entity as DataEntity;
+use crate::utils::macros::exec_stmt;
 use sea_orm_migration::{prelude::*, MigrationName};
 
 pub struct Migration;

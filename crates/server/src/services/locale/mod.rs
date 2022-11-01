@@ -3,6 +3,7 @@ use actix_web::web::scope;
 use actix_web::Scope;
 
 mod models;
+mod repository;
 mod routes;
 
 pub fn locale_service() -> Scope {
