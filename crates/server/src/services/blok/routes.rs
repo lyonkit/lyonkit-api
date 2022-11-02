@@ -9,7 +9,7 @@ use entity::blok::{Column, Entity, Model};
 use entity::page::{Column as PageColumn, Entity as PageEntity};
 use sea_orm::prelude::*;
 use sea_orm::ActiveValue::Set;
-use sea_orm::IntoActiveModel;
+use sea_orm::{IntoActiveModel, TryIntoModel};
 
 #[get("/{id}")]
 pub async fn get_blok(
@@ -42,7 +42,7 @@ pub async fn create_blok(
     data: web::Data<AppState>,
     body: web::Json<BlokInput>,
     api_key: WriteApiKey,
-) -> Result<HttpResponse, ActixError> {
+) -> Result<BlokOutput, ApiError> {
     let model = body.active_model();
 
     PageEntity::find()
@@ -56,8 +56,9 @@ pub async fn create_blok(
     Ok(model
         .save(data.conn())
         .await
-        .map_api_err()
-        .and_then(|model| Ok(HttpResponse::Ok().json(BlokOutput::try_from(model)?)))?)
+        .map_api_err()?
+        .try_into_model()?
+        .into())
 }
 
 #[put("/{id}")]
@@ -66,7 +67,7 @@ pub async fn update_blok(
     path_id: web::Path<i32>,
     body: web::Json<BlokInput>,
     api_key: WriteApiKey,
-) -> Result<HttpResponse, ActixError> {
+) -> Result<BlokOutput, ApiError> {
     let id = path_id.into_inner();
 
     Entity::find()
@@ -98,8 +99,9 @@ pub async fn update_blok(
     Ok(model
         .save(data.conn())
         .await
-        .map_api_err()
-        .and_then(|model| Ok(HttpResponse::Ok().json(BlokOutput::try_from(model)?)))?)
+        .map_api_err()?
+        .try_into_model()?
+        .into())
 }
 
 #[patch("/{id}")]
@@ -108,23 +110,23 @@ pub async fn patch_blok(
     path_id: web::Path<i32>,
     body: web::Json<BlokPatchInput>,
     api_key: WriteApiKey,
-) -> Result<HttpResponse, ActixError> {
+) -> Result<BlokOutput, ApiError> {
     let id = path_id.into_inner();
 
     if body.page_id().is_null() {
-        return Err(ApiError::PatchNotNullable(String::from("pageId")).into());
+        return Err(ApiError::PatchNotNullable(String::from("pageId")));
     }
 
     if body.component_id().is_null() {
-        return Err(ApiError::PatchNotNullable(String::from("componentId")).into());
+        return Err(ApiError::PatchNotNullable(String::from("componentId")));
     }
 
     if body.props().is_null() {
-        return Err(ApiError::PatchNotNullable(String::from("props")).into());
+        return Err(ApiError::PatchNotNullable(String::from("props")));
     }
 
     if body.priority().is_null() {
-        return Err(ApiError::PatchNotNullable(String::from("priority")).into());
+        return Err(ApiError::PatchNotNullable(String::from("priority")));
     }
 
     if body.page_id().is_missing()
@@ -132,7 +134,7 @@ pub async fn patch_blok(
         && body.props().is_missing()
         && body.priority().is_missing()
     {
-        return Err(ApiError::PatchAtLeastOneField.into());
+        return Err(ApiError::PatchAtLeastOneField);
     }
 
     let mut blok = Entity::find()
@@ -180,8 +182,9 @@ pub async fn patch_blok(
     Ok(blok
         .save(data.conn())
         .await
-        .map_api_err()
-        .and_then(|model| Ok(HttpResponse::Ok().json(BlokOutput::try_from(model)?)))?)
+        .map_api_err()?
+        .try_into_model()?
+        .into())
 }
 
 #[delete("/{id}")]

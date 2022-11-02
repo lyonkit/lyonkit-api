@@ -1,5 +1,6 @@
-use crate::errors::{utils::try_unwrap_active_value, ApiError};
 use crate::services::blok::models::BlokOutput;
+use actix_web::body::BoxBody;
+use actix_web::{HttpRequest, HttpResponse, Responder};
 use chrono::{DateTime, Utc};
 use entity::page;
 use sea_orm::ActiveValue::Set;
@@ -36,22 +37,6 @@ pub struct PageOutput {
     updated_at: DateTime<Utc>,
 }
 
-impl TryFrom<page::ActiveModel> for PageOutput {
-    type Error = ApiError;
-
-    fn try_from(model: page::ActiveModel) -> Result<Self, Self::Error> {
-        Ok(Self {
-            id: try_unwrap_active_value(model.id)?,
-            namespace: try_unwrap_active_value(model.namespace)?,
-            path: try_unwrap_active_value(model.path)?,
-            title: try_unwrap_active_value(model.title)?,
-            description: try_unwrap_active_value(model.description)?,
-            created_at: try_unwrap_active_value(model.created_at)?,
-            updated_at: try_unwrap_active_value(model.updated_at)?,
-        })
-    }
-}
-
 impl From<page::Model> for PageOutput {
     fn from(model: page::Model) -> Self {
         Self {
@@ -79,30 +64,6 @@ pub struct PageOutputWithBloks {
     updated_at: DateTime<Utc>,
 }
 
-impl TryFrom<(page::ActiveModel, Vec<entity::blok::ActiveModel>)> for PageOutputWithBloks {
-    type Error = ApiError;
-
-    fn try_from(
-        model: (page::ActiveModel, Vec<entity::blok::ActiveModel>),
-    ) -> Result<Self, Self::Error> {
-        let (page, bloks) = model;
-
-        Ok(Self {
-            id: try_unwrap_active_value(page.id)?,
-            namespace: try_unwrap_active_value(page.namespace)?,
-            path: try_unwrap_active_value(page.path)?,
-            title: try_unwrap_active_value(page.title)?,
-            description: try_unwrap_active_value(page.description)?,
-            bloks: bloks
-                .into_iter()
-                .map(|v| v.try_into())
-                .collect::<Result<_, _>>()?,
-            created_at: try_unwrap_active_value(page.created_at)?,
-            updated_at: try_unwrap_active_value(page.updated_at)?,
-        })
-    }
-}
-
 impl From<(page::Model, Vec<entity::blok::Model>)> for PageOutputWithBloks {
     fn from(model: (page::Model, Vec<entity::blok::Model>)) -> Self {
         let (page, bloks) = model;
@@ -117,5 +78,13 @@ impl From<(page::Model, Vec<entity::blok::Model>)> for PageOutputWithBloks {
             created_at: page.created_at,
             updated_at: page.updated_at,
         }
+    }
+}
+
+impl Responder for PageOutput {
+    type Body = BoxBody;
+
+    fn respond_to(self, _req: &HttpRequest) -> HttpResponse<Self::Body> {
+        HttpResponse::Ok().json(self)
     }
 }

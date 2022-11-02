@@ -1,4 +1,5 @@
-use crate::errors::{utils::try_unwrap_active_value, ApiError};
+use actix_web::body::BoxBody;
+use actix_web::{HttpRequest, HttpResponse, Responder};
 use chrono::{DateTime, Utc};
 use entity::post;
 use sea_orm::ActiveValue::Set;
@@ -38,23 +39,6 @@ pub struct PostOutput {
     updated_at: DateTime<Utc>,
 }
 
-impl TryFrom<post::ActiveModel> for PostOutput {
-    type Error = ApiError;
-
-    fn try_from(model: post::ActiveModel) -> Result<Self, Self::Error> {
-        Ok(Self {
-            id: try_unwrap_active_value(model.id)?,
-            namespace: try_unwrap_active_value(model.namespace)?,
-            title: try_unwrap_active_value(model.title)?,
-            description: try_unwrap_active_value(model.description)?,
-            slug: try_unwrap_active_value(model.slug)?,
-            body: try_unwrap_active_value(model.body)?,
-            created_at: try_unwrap_active_value(model.created_at)?,
-            updated_at: try_unwrap_active_value(model.updated_at)?,
-        })
-    }
-}
-
 impl From<post::Model> for PostOutput {
     fn from(model: post::Model) -> Self {
         Self {
@@ -67,5 +51,13 @@ impl From<post::Model> for PostOutput {
             created_at: model.created_at,
             updated_at: model.updated_at,
         }
+    }
+}
+
+impl Responder for PostOutput {
+    type Body = BoxBody;
+
+    fn respond_to(self, _req: &HttpRequest) -> HttpResponse<Self::Body> {
+        HttpResponse::Ok().json(self)
     }
 }
