@@ -2,6 +2,7 @@ pub mod utils;
 
 use actix_web::{body::BoxBody, http::StatusCode, HttpResponse, ResponseError};
 use mime::Mime;
+use sea_orm::DbErr;
 use serde_json::json;
 use std::fmt::{Debug, Display, Formatter};
 
@@ -111,5 +112,11 @@ impl ApiErrorTrait for ApiError {
 impl ResponseError for ApiError {
     fn error_response(&self) -> HttpResponse<BoxBody> {
         self.http_response()
+    }
+}
+
+impl From<DbErr> for ApiError {
+    fn from(_value: DbErr) -> Self {
+        ApiError::DbError
     }
 }

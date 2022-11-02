@@ -8,7 +8,7 @@ pub use crate::{
 };
 use actix_web::{delete, get, post, put, web, Error as ActixError, HttpResponse};
 use entity::post::{Column, Entity, Model};
-use sea_orm::{prelude::*, ActiveValue::Set};
+use sea_orm::{prelude::*, ActiveValue::Set, TryIntoModel};
 
 #[get("")]
 pub async fn list_posts(
@@ -72,15 +72,16 @@ pub async fn create_post(
     data: web::Data<AppState>,
     body: web::Json<PostInput>,
     api_key: WriteApiKey,
-) -> Result<HttpResponse, ActixError> {
+) -> Result<PostOutput, ApiError> {
     let mut model = body.active_model();
     model.namespace = Set(api_key.namespace().into());
 
     Ok(model
         .save(data.conn())
         .await
-        .map_api_err()
-        .and_then(|model| Ok(HttpResponse::Ok().json(PostOutput::try_from(model)?)))?)
+        .map_api_err()?
+        .try_into_model()?
+        .into())
 }
 
 #[put("/{id}")]
@@ -89,7 +90,7 @@ pub async fn update_post(
     path_id: web::Path<i32>,
     body: web::Json<PostInput>,
     api_key: WriteApiKey,
-) -> Result<HttpResponse, ActixError> {
+) -> Result<PostOutput, ApiError> {
     let id = path_id.into_inner();
 
     // Page must exists to be replaced
@@ -108,8 +109,9 @@ pub async fn update_post(
     Ok(model
         .save(data.conn())
         .await
-        .map_api_err()
-        .and_then(|model| Ok(HttpResponse::Ok().json(PostOutput::try_from(model)?)))?)
+        .map_api_err()?
+        .try_into_model()?
+        .into())
 }
 
 #[delete("/{id}")]

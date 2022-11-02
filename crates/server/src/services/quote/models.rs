@@ -1,5 +1,5 @@
-use crate::errors::utils::try_unwrap_active_value;
-use crate::errors::ApiError;
+use actix_web::body::BoxBody;
+use actix_web::{HttpRequest, HttpResponse, Responder};
 use chrono::{DateTime, Utc};
 use entity::quote;
 use sea_orm::ActiveValue::Set;
@@ -33,21 +33,6 @@ pub struct QuoteOutput {
     updated_at: DateTime<Utc>,
 }
 
-impl TryFrom<quote::ActiveModel> for QuoteOutput {
-    type Error = ApiError;
-
-    fn try_from(model: quote::ActiveModel) -> Result<Self, Self::Error> {
-        Ok(Self {
-            id: try_unwrap_active_value(model.id)?,
-            namespace: try_unwrap_active_value(model.namespace)?,
-            author: try_unwrap_active_value(model.author)?,
-            message: try_unwrap_active_value(model.message)?,
-            created_at: try_unwrap_active_value(model.created_at)?,
-            updated_at: try_unwrap_active_value(model.updated_at)?,
-        })
-    }
-}
-
 impl From<quote::Model> for QuoteOutput {
     fn from(model: quote::Model) -> Self {
         Self {
@@ -58,5 +43,13 @@ impl From<quote::Model> for QuoteOutput {
             created_at: model.created_at,
             updated_at: model.updated_at,
         }
+    }
+}
+
+impl Responder for QuoteOutput {
+    type Body = BoxBody;
+
+    fn respond_to(self, _req: &HttpRequest) -> HttpResponse<Self::Body> {
+        HttpResponse::Ok().json(self)
     }
 }
