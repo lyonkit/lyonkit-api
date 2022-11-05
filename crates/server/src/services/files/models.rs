@@ -11,6 +11,7 @@ use serde_json::Value;
 #[serde(rename_all = "camelCase")]
 #[getset(get = "pub")]
 pub struct FileInput {
+    pub content_type: Option<String>,
     pub content_length: u32,
     pub file_name: String,
     pub tags: Vec<String>,

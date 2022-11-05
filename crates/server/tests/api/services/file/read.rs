@@ -16,6 +16,7 @@ async fn create_test_file<T: ConnectionTrait>(
     db.create_file(
         namespace,
         FileInput {
+            content_type: Some("text/plain".to_string()),
             content_length: 10000000,
             tags: tags.iter().map(|str| str.to_string()).collect(),
             metadata: HashMap::from([("some".to_string(), "metadata".to_string())]),

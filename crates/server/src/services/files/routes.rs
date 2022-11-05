@@ -23,6 +23,7 @@ pub async fn create_file(
     s3_provider: S3ClientProvider,
     file_data: web::Json<FileInput>,
 ) -> Result<UploadFileOutput, ApiError> {
+    let maybe_content_type = file_data.content_type.clone();
     let content_length = *file_data.content_length();
     let max_file_size = 50_000_000_u32;
     if content_length > max_file_size {
@@ -37,15 +38,18 @@ pub async fn create_file(
     let settings = data.settings();
     let s3_client = s3_provider.provide();
 
-    let presigned_url = s3_client
+    let mut s3_request = s3_client
         .put_object()
         .content_length(content_length.into())
         .bucket(settings.s3().buckets().file())
         .key(model.storage_key())
-        .acl(PublicRead)
-        .metadata("tags", model.tags().join(", "))
-        .metadata("namespace", api_key.namespace())
-        .metadata("metadata", serde_json::to_string(model.metadata()).unwrap())
+        .acl(PublicRead);
+
+    if let Some(content_type) = maybe_content_type {
+        s3_request = s3_request.content_type(content_type)
+    }
+
+    let presigned_url = s3_request
         .presigned(
             PresigningConfig::builder()
                 .expires_in(Duration::from_secs(180))
