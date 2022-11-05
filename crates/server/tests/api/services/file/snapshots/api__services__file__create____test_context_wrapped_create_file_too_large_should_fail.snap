@@ -1,0 +1,8 @@
+---
+source: crates/server/tests/api/services/file/create.rs
+expression: res
+---
+{
+  "code": "FTBIG",
+  "message": "The file you are trying to upload is too big (your file is 1 GB but the maximum size is 50 MB)"
+}

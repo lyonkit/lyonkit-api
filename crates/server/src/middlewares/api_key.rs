@@ -11,8 +11,7 @@ use std::{
     future::{ready, Ready},
     rc::Rc,
 };
-use tracing::{error, warn};
-use tracing::{info_span, Instrument};
+use tracing::{error, info_span, warn, Instrument};
 use uuid::Uuid;
 
 #[derive(Getters, Clone)]

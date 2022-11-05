@@ -1,8 +1,7 @@
 use crate::services::quote::routes::{
     create_quote, delete_quote, get_quote, list_quotes, update_quote,
 };
-use actix_web::web::scope;
-use actix_web::Scope;
+use actix_web::{web::scope, Scope};
 
 mod models;
 mod routes;

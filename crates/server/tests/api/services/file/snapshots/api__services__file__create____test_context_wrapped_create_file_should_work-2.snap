@@ -1,0 +1,7 @@
+---
+source: crates/server/tests/api/services/file/create.rs
+expression: "res.get(\"metadata\")"
+---
+{
+  "some": "metadata"
+}

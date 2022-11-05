@@ -1,5 +1,4 @@
-use crate::services::locale::LocaleFixtures;
-use crate::test_app::TestApp;
+use crate::{services::locale::LocaleFixtures, test_app::TestApp};
 use serde_json::json;
 use test_context::test_context;
 

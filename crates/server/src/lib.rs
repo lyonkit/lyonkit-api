@@ -1,6 +1,4 @@
-use crate::config::SETTINGS;
-use crate::server::Server;
-use crate::telemetry::init_tracing;
+use crate::{config::SETTINGS, server::Server, telemetry::init_tracing};
 use std::io;
 
 pub mod config;

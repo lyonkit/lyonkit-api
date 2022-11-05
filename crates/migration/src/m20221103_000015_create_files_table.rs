@@ -1,64 +1,57 @@
-use crate::utils::macros::{create_table_from_entity, exec_stmt};
-use entity::{locale::Entity, locale_data::Entity as DataEntity};
 use sea_orm_migration::{prelude::*, MigrationName};
+
+use entity::file::Entity;
+
+use crate::utils::macros::{create_table_from_entity, exec_stmt};
 
 pub struct Migration;
 
 impl MigrationName for Migration {
     fn name(&self) -> &str {
-        "m20221013_000013_create_locale_table"
+        "m20221103_000015_create_files_table"
     }
 }
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        exec_stmt!(manager, r#"drop table if exists locales"#)?;
-        exec_stmt!(manager, r#"drop table if exists locales_data"#)?;
-        create_table_from_entity!(manager, DataEntity)?;
+        exec_stmt!(manager, r#"drop table if exists files"#)?;
         create_table_from_entity!(manager, Entity)?;
 
         // Set default value for created_at / updated_at columns and adds constraint
         exec_stmt!(
             manager,
-            r#"alter table locales
+            r#"alter table files
                 alter column created_at set default now(),
                 alter column updated_at set default now(),
-                drop constraint if exists "fk-locales-namespace",
-                add constraint "fk-locales-namespace"
+                add constraint files_storage_key_unique unique (storage_key),
+                alter column tags type text[],
+                alter column tags set default '{{}}'::text[],
+                alter column metadata type jsonb,
+                alter column metadata set default '{{}}'::jsonb,
+                drop constraint if exists "fk-files-namespace",
+                add constraint "fk-files-namespace"
                     foreign key (namespace)
                     references namespaces (name)
                     on update cascade
-                    on delete cascade,
-                drop constraint if exists "fk-locales-locale_data_id",
-                add constraint "fk-locales-locale_data_id"
-                    foreign key (locale_data_id)
-                    references locales_data
-                    on update cascade
-                    on delete cascade,
-                add constraint "locale-namespace-lang-uniq-idx"
-                    unique (namespace, lang)
+                    on delete cascade
             "#
         )?;
-        exec_stmt!(
-            manager,
-            r#"alter table locales_data
-                alter column messages type jsonb
-            "#
-        )?;
+        exec_stmt!(manager, r#"create index tags_idx on files (tags)"#)?;
+        exec_stmt!(manager, r#"create index metadata_idx on files (metadata)"#)?;
 
         // Trigger for timestamps
         exec_stmt!(
             manager,
             r#"create trigger _100_timestamps
-                before insert or update on locales
+                before insert or update on files
                 for each row execute procedure tg__timestamps();
             "#
         )?;
         exec_stmt!(
             manager,
             r#"create trigger _500_create_missing_namespace
-                before insert or update on locales
+                before insert or update on files
                 for each row execute procedure public.tg__create_missing_namespace();
             "#
         )?;
@@ -70,10 +63,6 @@ impl MigrationTrait for Migration {
         manager
             .drop_table(Table::drop().table(Entity).to_owned())
             .await?;
-        manager
-            .drop_table(Table::drop().table(DataEntity).to_owned())
-            .await?;
-
         Ok(())
     }
 }

@@ -1,20 +1,19 @@
-mod blok;
-mod git_json_file;
-mod image;
-mod locale;
-mod page;
-mod post;
-mod quote;
+pub mod blok;
+pub mod files;
+pub mod git_json_file;
+pub mod image;
+pub mod locale;
+pub mod page;
+pub mod post;
+pub mod quote;
 
-use crate::middlewares::s3::S3ProviderMiddlewareFactory;
-use crate::services::git_json_file::git_json_file_service;
-use crate::services::image::image_service;
-use crate::services::locale::locale_service;
-use crate::services::post::post_service;
-use crate::services::quote::quote_service;
 use crate::{
-    middlewares::api_key::ApiKeyMiddlewareFactory,
-    services::{blok::blok_service, page::page_service},
+    middlewares::{api_key::ApiKeyMiddlewareFactory, s3::S3ProviderMiddlewareFactory},
+    services::{
+        blok::blok_service, files::file_service, git_json_file::git_json_file_service,
+        image::image_service, locale::locale_service, page::page_service, post::post_service,
+        quote::quote_service,
+    },
 };
 use actix_web::{
     dev::{ServiceFactory, ServiceRequest, ServiceResponse},
@@ -58,4 +57,5 @@ pub fn api_services() -> Scope<
         .service(quote_service())
         .service(locale_service())
         .service(git_json_file_service())
+        .service(file_service())
 }

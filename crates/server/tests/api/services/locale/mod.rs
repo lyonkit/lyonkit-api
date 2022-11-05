@@ -1,7 +1,5 @@
 use async_trait::async_trait;
-use sea_orm::prelude::*;
-use sea_orm::ActiveValue::Set;
-use sea_orm::ConnectionTrait;
+use sea_orm::{prelude::*, ActiveValue::Set, ConnectionTrait};
 use serde_json::Value;
 
 mod read;

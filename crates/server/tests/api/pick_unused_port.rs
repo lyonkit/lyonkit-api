@@ -1,7 +1,9 @@
 use lazy_static::lazy_static;
 use portpicker::Port;
-use std::collections::HashSet;
-use std::sync::{Arc, Mutex};
+use std::{
+    collections::HashSet,
+    sync::{Arc, Mutex},
+};
 
 lazy_static! {
     static ref USED_PORTS: Arc<Mutex<HashSet<Port>>> = Arc::new(Mutex::new(HashSet::new()));
@@ -12,7 +14,8 @@ lazy_static! {
 /// We have to make sure the port is not used by another test
 /// That's how the pick_unused_port is supposed to work
 /// However, it is not thread safe
-/// This function keeps a mutex guard of all used ports and will generate other ports if they are already used
+/// This function keeps a mutex guard of all used ports and will generate other
+/// ports if they are already used
 pub fn pick_unused_port() -> Port {
     for _ in 0..10 {
         match portpicker::pick_unused_port() {

@@ -1,6 +1,5 @@
 use crate::services::image::routes::{delete_image, list_images, upload_image};
-use actix_web::web::scope;
-use actix_web::Scope;
+use actix_web::{web::scope, Scope};
 
 mod models;
 mod routes;

@@ -1,6 +1,7 @@
-use crate::config::SETTINGS;
-use crate::errors::utils::try_unwrap_active_value;
-use crate::errors::ApiError;
+use crate::{
+    config::SETTINGS,
+    errors::{utils::try_unwrap_active_value, ApiError},
+};
 use chrono::{DateTime, Utc};
 use getset::Getters;
 use serde::{Deserialize, Serialize};

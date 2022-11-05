@@ -1,8 +1,6 @@
 use aws_smithy_async::rt::sleep::default_async_sleep;
 use aws_smithy_http::endpoint::Endpoint;
-use aws_types::app_name::AppName;
-use aws_types::region::Region;
-use aws_types::Credentials;
+use aws_types::{app_name::AppName, region::Region, Credentials};
 use config::Environment;
 pub use config::{Config, ConfigError};
 use derive_more::Constructor;
@@ -92,6 +90,7 @@ impl S3Credentials {
 #[getset(get = "pub")]
 pub struct S3Buckets {
     image: String,
+    file: String,
 }
 
 impl Settings {
@@ -102,6 +101,7 @@ impl Settings {
             .set_default("host", "0.0.0.0")?
             .set_default("telemetry", false)?
             .set_default("s3.buckets.image", "lyonkit-images")?
+            .set_default("s3.buckets.file", "lyonkit-files")?
             .set_default("cors", Vec::<String>::new())?
             .set_default("log_format", "json")?
             .add_source(

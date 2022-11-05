@@ -1,15 +1,17 @@
 use super::models::{BlokInput, BlokOutput};
-use crate::errors::utils::MapApiError;
-use crate::middlewares::api_key::ApiKey;
-use crate::services::blok::models::BlokPatchInput;
-use crate::utils::serde_json_patch::Patch::Value;
-use crate::{errors::ApiError, middlewares::api_key::WriteApiKey, server::AppState};
+use crate::{
+    errors::{utils::MapApiError, ApiError},
+    middlewares::api_key::{ApiKey, WriteApiKey},
+    server::AppState,
+    services::blok::models::BlokPatchInput,
+    utils::serde_json_patch::Patch::Value,
+};
 use actix_web::{delete, get, patch, post, put, web, Error as ActixError, HttpResponse};
-use entity::blok::{Column, Entity, Model};
-use entity::page::{Column as PageColumn, Entity as PageEntity};
-use sea_orm::prelude::*;
-use sea_orm::ActiveValue::Set;
-use sea_orm::{IntoActiveModel, TryIntoModel};
+use entity::{
+    blok::{Column, Entity, Model},
+    page::{Column as PageColumn, Entity as PageEntity},
+};
+use sea_orm::{prelude::*, ActiveValue::Set, IntoActiveModel, TryIntoModel};
 
 #[get("/{id}")]
 pub async fn get_blok(

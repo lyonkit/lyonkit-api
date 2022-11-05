@@ -1,5 +1,4 @@
-use crate::errors::ApiError;
-use crate::services::git_json_file::models::GitJsonFile;
+use crate::{errors::ApiError, services::git_json_file::models::GitJsonFile};
 use base64::decode as decode_b64;
 use lazy_static::lazy_static;
 use reqwest::Client;

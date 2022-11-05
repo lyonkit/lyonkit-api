@@ -1,8 +1,12 @@
 use crate::{config::Settings, services::api_services};
 use actix_cors::Cors;
-use actix_web::http::header::{HeaderName, CONTENT_DISPOSITION, CONTENT_TYPE, ORIGIN};
-use actix_web::http::Method;
-use actix_web::{web, App, HttpServer};
+use actix_web::{
+    http::{
+        header::{HeaderName, CONTENT_DISPOSITION, CONTENT_TYPE, ORIGIN},
+        Method,
+    },
+    web, App, HttpServer,
+};
 use derive_more::Constructor;
 use getset::Getters;
 use migration::{Migrator, MigratorTrait};
@@ -34,13 +38,14 @@ pub struct ActiveServer {
 impl Server {
     pub async fn from_settings(settings: &Settings) -> Self {
         Self::new(
-      settings.clone(),
-      sea_orm::Database::connect(settings.database_url())
-        .await
-        .expect(
-          "Failed to connect to the database, please ensure the given env DATABASE_URL is valid !",
-        ),
-    )
+            settings.clone(),
+            sea_orm::Database::connect(settings.database_url())
+                .await
+                .expect(
+                    "Failed to connect to the database, please ensure the given env DATABASE_URL \
+                     is valid !",
+                ),
+        )
     }
 
     pub async fn migrate(self) -> Self {

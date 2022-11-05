@@ -1,5 +1,4 @@
-use actix_web::body::BoxBody;
-use actix_web::{HttpRequest, HttpResponse, Responder};
+use actix_web::{body::BoxBody, HttpRequest, HttpResponse, Responder};
 use chrono::{DateTime, Utc};
 use entity::blok;
 use serde::Serialize;

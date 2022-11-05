@@ -1,7 +1,6 @@
 use actix_web::http::StatusCode;
 use serde_json::Value;
-use std::collections::HashSet;
-use std::path::Path;
+use std::{collections::HashSet, path::Path};
 use url::Url;
 
 mod create;

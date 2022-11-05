@@ -1,10 +1,10 @@
 use super::services::fetch_git_json_file;
-use crate::errors::utils::MapApiError;
-use crate::errors::ApiError;
-use crate::middlewares::api_key::WriteApiKey;
-use crate::server::AppState;
-use crate::services::git_json_file::models::GitCommitPayload;
-use crate::services::git_json_file::services::GITHUB_CLIENT;
+use crate::{
+    errors::{utils::MapApiError, ApiError},
+    middlewares::api_key::WriteApiKey,
+    server::AppState,
+    services::git_json_file::{models::GitCommitPayload, services::GITHUB_CLIENT},
+};
 use actix_web::{get, put, web, Error as ActixError, HttpResponse};
 use entity::git_auth::{Column, Entity};
 use sea_orm::prelude::*;

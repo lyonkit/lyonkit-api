@@ -1,4 +1,5 @@
 mod blok;
+mod file;
 mod image;
 mod locale;
 mod page;

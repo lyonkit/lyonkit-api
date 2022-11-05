@@ -1,8 +1,5 @@
-use crate::services;
-use crate::services::image::assert_image_output;
-use crate::test_app::TestApp;
-use reqwest::multipart;
-use reqwest::{Response, StatusCode};
+use crate::{services, services::image::assert_image_output, test_app::TestApp};
+use reqwest::{multipart, Response, StatusCode};
 use serde_json::Value;
 use test_context::test_context;
 use tokio::fs::File;

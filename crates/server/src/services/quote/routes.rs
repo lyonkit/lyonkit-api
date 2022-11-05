@@ -1,13 +1,12 @@
-use crate::errors::utils::MapApiError;
-use crate::errors::ApiError;
-use crate::middlewares::api_key::{ApiKey, WriteApiKey};
-use crate::server::AppState;
-use crate::services::quote::models::{QuoteInput, QuoteOutput};
+use crate::{
+    errors::{utils::MapApiError, ApiError},
+    middlewares::api_key::{ApiKey, WriteApiKey},
+    server::AppState,
+    services::quote::models::{QuoteInput, QuoteOutput},
+};
 use actix_web::{delete, get, post, put, web, Error as ActixError, HttpResponse};
 use entity::quote::{Column, Entity, Model};
-use sea_orm::prelude::*;
-use sea_orm::ActiveValue::Set;
-use sea_orm::TryIntoModel;
+use sea_orm::{prelude::*, ActiveValue::Set, TryIntoModel};
 
 #[get("")]
 pub async fn list_quotes(

@@ -1,13 +1,16 @@
 use crate::config::SETTINGS;
-use actix_web::dev::{forward_ready, Payload, Service, ServiceRequest, ServiceResponse, Transform};
-use actix_web::{Error as ActixError, FromRequest, HttpMessage, HttpRequest};
+use actix_web::{
+    dev::{forward_ready, Payload, Service, ServiceRequest, ServiceResponse, Transform},
+    Error as ActixError, FromRequest, HttpMessage, HttpRequest,
+};
 use derive_more::Constructor;
-use futures::future::LocalBoxFuture;
-use futures::FutureExt;
+use futures::{future::LocalBoxFuture, FutureExt};
 use getset::Getters;
-use std::future::{ready, Ready};
-use std::rc::Rc;
-use std::sync::Arc;
+use std::{
+    future::{ready, Ready},
+    rc::Rc,
+    sync::Arc,
+};
 
 #[derive(Constructor)]
 pub struct S3ProviderMiddlewareFactory;

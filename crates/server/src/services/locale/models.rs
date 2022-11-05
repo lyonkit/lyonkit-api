@@ -1,10 +1,10 @@
-use crate::errors::utils::TryUnwrapActiveValue;
-use crate::errors::ApiError;
-use actix_web::body::BoxBody;
-use actix_web::{HttpRequest, HttpResponse, Responder};
+use crate::errors::{utils::TryUnwrapActiveValue, ApiError};
+use actix_web::{body::BoxBody, HttpRequest, HttpResponse, Responder};
 use chrono::Utc;
-use entity::locale::Model as LocaleModel;
-use entity::locale_data::{ActiveModel as LocalDataActiveModel, Model as LocaleDataModel};
+use entity::{
+    locale::Model as LocaleModel,
+    locale_data::{ActiveModel as LocalDataActiveModel, Model as LocaleDataModel},
+};
 use serde::Serialize;
 use serde_json::Value;
 use std::collections::HashMap;

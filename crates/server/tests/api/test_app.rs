@@ -1,5 +1,7 @@
-use crate::pick_unused_port::{pick_unused_port, release_port};
-use crate::utils;
+use crate::{
+    pick_unused_port::{pick_unused_port, release_port},
+    utils,
+};
 use async_trait::async_trait;
 use aws_sdk_s3::Client;
 use getset::{Getters, Setters};
@@ -9,9 +11,8 @@ use reqwest::Method;
 use sea_orm::{ActiveModelTrait, ActiveValue, ConnectionTrait, DatabaseConnection};
 use serde::Serialize;
 use serde_json::json;
-use server::config::{LogFormat, S3Buckets, S3Config, S3Credentials};
 use server::{
-    config::Settings,
+    config::{LogFormat, S3Buckets, S3Config, S3Credentials, Settings},
     server::Server,
     telemetry::{get_subscriber, init_subscriber},
 };
@@ -288,7 +289,7 @@ pub async fn spawn_app() -> TestApp {
                 env::var("S3__CREDENTIALS__SECRET_ACCESS_KEY")
                     .expect("No S3 credentials secret key specified"),
             ),
-            S3Buckets::new(s3_bucket),
+            S3Buckets::new(s3_bucket.clone(), s3_bucket),
         ),
         Vec::new(),
         LogFormat::Json,

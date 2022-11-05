@@ -1,5 +1,4 @@
-use crate::services::image::create::create_image;
-use crate::test_app::TestApp;
+use crate::{services::image::create::create_image, test_app::TestApp};
 use reqwest::StatusCode;
 use serde_json::Value;
 use test_context::test_context;

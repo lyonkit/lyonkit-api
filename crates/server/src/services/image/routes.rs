@@ -1,27 +1,23 @@
-use crate::config::Settings;
-use crate::errors::utils::MapApiError;
-use crate::errors::ApiError;
-use crate::middlewares::api_key::{ApiKey, WriteApiKey};
-use crate::middlewares::s3::{S3ClientExt, S3ClientProvider};
-use crate::server::AppState;
-use crate::services::image::models::{ImageOutput, ImageUploadQuery};
+use crate::{
+    config::Settings,
+    errors::{utils::MapApiError, ApiError},
+    middlewares::{
+        api_key::{ApiKey, WriteApiKey},
+        s3::{S3ClientExt, S3ClientProvider},
+    },
+    server::AppState,
+    services::image::models::{ImageOutput, ImageUploadQuery},
+};
 use actix_multipart::Multipart;
 use actix_web::{delete, get, post, web, Error as ActixError, HttpResponse};
-use aws_sdk_s3::model::ObjectCannedAcl::PublicRead;
-use aws_sdk_s3::types::ByteStream;
+use aws_sdk_s3::{model::ObjectCannedAcl::PublicRead, types::ByteStream};
 use aws_smithy_http::body::SdkBody;
 use deunicode::deunicode;
 use entity::image::{Column, Entity, LazyImageLink, Model};
-use futures::future::ready;
-use futures::{StreamExt, TryFutureExt};
-use image::codecs::jpeg::JpegEncoder;
-use image::imageops::FilterType;
-use image::DynamicImage;
-use sea_orm::prelude::*;
-use sea_orm::ActiveValue::Set;
-use std::ffi::OsStr;
-use std::path::Path;
-use std::sync::Arc;
+use futures::{future::ready, StreamExt, TryFutureExt};
+use image::{codecs::jpeg::JpegEncoder, imageops::FilterType, DynamicImage};
+use sea_orm::{prelude::*, ActiveValue::Set};
+use std::{ffi::OsStr, path::Path, sync::Arc};
 use tracing::{error, info_span, warn, Instrument};
 use uuid::Uuid;
 
@@ -146,7 +142,8 @@ pub async fn upload_image(
         match field.name() {
             "image" => {
                 let content_type = field.content_type().clone();
-                // ["gif", "jpeg", "ico", "png", "pnm", "tga", "tiff", "webp", "bmp", "hdr", "dxt", "dds", "farbfeld", "jpeg_rayon", "openexr"]
+                // ["gif", "jpeg", "ico", "png", "pnm", "tga", "tiff", "webp", "bmp", "hdr",
+                // "dxt", "dds", "farbfeld", "jpeg_rayon", "openexr"]
                 let supported_mime = vec![
                     mime::IMAGE_JPEG,
                     mime::IMAGE_PNG,

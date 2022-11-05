@@ -1,12 +1,13 @@
-use crate::errors::utils::MapApiError;
-use crate::errors::ApiError;
-use crate::services::locale::models::{LocaleOutput, LocalesMessages};
+use crate::{
+    errors::{utils::MapApiError, ApiError},
+    services::locale::models::{LocaleOutput, LocalesMessages},
+};
 use async_trait::async_trait;
-use entity::locale::{Column as LocaleColumn, Entity as LocaleEntity};
-use entity::locale_data::{ActiveModel as LocalDataActiveModel, Entity as LocalDataEntity};
-use sea_orm::prelude::*;
-use sea_orm::ActiveValue::Set;
-use sea_orm::ConnectionTrait;
+use entity::{
+    locale::{Column as LocaleColumn, Entity as LocaleEntity},
+    locale_data::{ActiveModel as LocalDataActiveModel, Entity as LocalDataEntity},
+};
+use sea_orm::{prelude::*, ActiveValue::Set, ConnectionTrait};
 
 #[async_trait]
 pub trait LocaleRepository {

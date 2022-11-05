@@ -1,5 +1,4 @@
-use crate::services::quote::create::create_quote;
-use crate::test_app::TestApp;
+use crate::{services::quote::create::create_quote, test_app::TestApp};
 use reqwest::StatusCode;
 use serde_json::{json, Value};
 use test_context::test_context;

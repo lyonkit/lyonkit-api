@@ -1,6 +1,7 @@
-use crate::errors::utils::MapApiError;
-use crate::middlewares::api_key::ApiKey;
-use crate::services::page::models::PageOutputWithBloks;
+use crate::{
+    errors::utils::MapApiError, middlewares::api_key::ApiKey,
+    services::page::models::PageOutputWithBloks,
+};
 pub use crate::{
     errors::{utils::db_err_into_api_err, ApiError},
     middlewares::api_key::WriteApiKey,

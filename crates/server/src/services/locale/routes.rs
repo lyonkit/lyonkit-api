@@ -1,10 +1,13 @@
-use crate::errors::ApiError;
-use crate::middlewares::api_key::{ApiKey, WriteApiKey};
-use crate::server::AppState;
-use crate::services::locale::models::{LocaleOutput, LocalesMessages};
-use crate::services::locale::repository::LocaleRepository;
-use actix_web::web::Path;
-use actix_web::{get, put, web};
+use crate::{
+    errors::ApiError,
+    middlewares::api_key::{ApiKey, WriteApiKey},
+    server::AppState,
+    services::locale::{
+        models::{LocaleOutput, LocalesMessages},
+        repository::LocaleRepository,
+    },
+};
+use actix_web::{get, put, web, web::Path};
 use serde_json::Value;
 
 #[get("")]

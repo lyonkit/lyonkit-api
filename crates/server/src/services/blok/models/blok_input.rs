@@ -1,7 +1,6 @@
 use entity::blok;
 use getset::Getters;
-use sea_orm::ActiveValue::Set;
-use sea_orm::NotSet;
+use sea_orm::{ActiveValue::Set, NotSet};
 use serde::Deserialize;
 use serde_json::Value;
 

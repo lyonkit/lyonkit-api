@@ -1,5 +1,7 @@
-use aws_sdk_s3::model::{Delete, ObjectIdentifier};
-use aws_sdk_s3::Client;
+use aws_sdk_s3::{
+    model::{Delete, ObjectIdentifier},
+    Client,
+};
 use futures::future::try_join_all;
 
 /// Deletes a bucket from S3 by removing all its files first
