@@ -1,0 +1,12 @@
+---
+source: crates/server/tests/api/services/file/update.rs
+expression: body
+---
+{
+  "metadata": {
+    "update": "no"
+  },
+  "tags": [
+    "events"
+  ]
+}

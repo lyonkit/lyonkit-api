@@ -7,13 +7,20 @@ use getset::Getters;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+#[derive(Clone, Debug, Deserialize, Getters)]
+#[serde(rename_all = "camelCase")]
+#[getset(get = "pub")]
+pub struct FilePayload {
+    pub content_type: Option<String>,
+    pub content_length: u32,
+    pub file_name: String,
+}
+
 #[derive(Deserialize, Clone, Getters)]
 #[serde(rename_all = "camelCase")]
 #[getset(get = "pub")]
 pub struct FileInput {
-    pub content_type: Option<String>,
-    pub content_length: u32,
-    pub file_name: String,
+    pub file: FilePayload,
     pub tags: Vec<String>,
     pub metadata: HashMap<String, String>,
 }
@@ -23,7 +30,7 @@ pub struct FileInput {
 #[getset(get = "pub")]
 pub struct UploadFileOutput {
     pub id: i32,
-    pub upload_url: String,
+    pub upload_url: Option<String>,
     pub key: String,
     pub public_url: String,
     pub tags: Vec<String>,
@@ -93,4 +100,26 @@ impl IntoFileOutputList for Vec<Model> {
 #[getset(get = "pub")]
 pub struct FileFilter {
     tag: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Getters)]
+#[getset(get = "pub")]
+pub struct FileUpdateInput {
+    pub file: Option<FilePayload>,
+    pub tags: Option<Vec<String>>,
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+#[derive(Debug, Serialize, Getters)]
+#[getset(get = "pub")]
+pub struct FileDeleteResponse {
+    pub id: i32,
+}
+
+impl Responder for FileDeleteResponse {
+    type Body = BoxBody;
+
+    fn respond_to(self, _req: &HttpRequest) -> HttpResponse<Self::Body> {
+        HttpResponse::Ok().json(self)
+    }
 }

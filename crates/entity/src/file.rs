@@ -1,10 +1,12 @@
-use getset::Getters;
+use getset::{Getters, Setters};
 use sea_orm::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Eq, PartialEq, DeriveEntityModel, Deserialize, Serialize, Getters)]
+#[derive(
+    Clone, Debug, Eq, PartialEq, DeriveEntityModel, Deserialize, Serialize, Getters, Setters,
+)]
 #[sea_orm(table_name = "files")]
-#[getset(get = "pub")]
+#[getset(get = "pub", set = "pub")]
 pub struct Model {
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]

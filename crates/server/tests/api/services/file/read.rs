@@ -4,7 +4,10 @@ use reqwest::StatusCode;
 use sea_orm::ConnectionTrait;
 use test_context::test_context;
 
-use server::services::files::{models::FileInput, repository::FilesRepository};
+use server::services::files::{
+    models::{FileInput, FilePayload},
+    repository::FilesRepository,
+};
 
 use crate::test_app::TestApp;
 
@@ -16,11 +19,13 @@ async fn create_test_file<T: ConnectionTrait>(
     db.create_file(
         namespace,
         FileInput {
-            content_type: Some("text/plain".to_string()),
-            content_length: 10000000,
+            file: FilePayload {
+                content_type: Some("text/plain".to_string()),
+                content_length: 10000000,
+                file_name: "file.txt".to_string(),
+            },
             tags: tags.iter().map(|str| str.to_string()).collect(),
             metadata: HashMap::from([("some".to_string(), "metadata".to_string())]),
-            file_name: "file.txt".to_string(),
         },
     )
     .await

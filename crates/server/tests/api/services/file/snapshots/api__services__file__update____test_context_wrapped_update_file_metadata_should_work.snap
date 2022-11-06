@@ -1,0 +1,13 @@
+---
+source: crates/server/tests/api/services/file/update.rs
+expression: body
+---
+{
+  "metadata": {
+    "update": "yes"
+  },
+  "tags": [
+    "events"
+  ],
+  "uploadUrl": null
+}

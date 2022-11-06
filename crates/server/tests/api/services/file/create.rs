@@ -14,8 +14,10 @@ async fn create_file_should_work(ctx: &mut TestApp) {
         .post(
             "/file",
             json!({
-                "contentLength": 1000000,
-                "fileName": "file.pdf",
+                "file": {
+                    "contentLength": 1000000,
+                    "fileName": "file.pdf"
+                },
                 "tags": ["events"],
                 "metadata": {
                     "some": "metadata"
@@ -49,8 +51,10 @@ async fn create_file_too_large_should_fail(ctx: &mut TestApp) {
         .post(
             "/file",
             json!({
-                "contentLength": 1000000000,
-                "fileName": "file.pdf",
+                "file": {
+                    "contentLength": 1000000000,
+                    "fileName": "file.pdf",
+                },
                 "tags": ["events"],
                 "metadata": {
                     "some": "metadata"
