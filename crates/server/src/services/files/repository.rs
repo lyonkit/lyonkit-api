@@ -1,11 +1,14 @@
 use std::collections::HashMap;
 
 use async_trait::async_trait;
-use sea_orm::{prelude::*, sea_query::Expr, ActiveModelTrait, ActiveValue::Set, ConnectionTrait};
+use sea_orm::{
+    prelude::*, sea_query::Expr, ActiveModelTrait, ActiveValue::Set, ConnectionTrait, QueryOrder,
+};
 use serde_json::{Map, Value};
 use uuid::Uuid;
 
 use entity::file::{ActiveModel, Column, Entity, Model};
+use migration::Order;
 
 use crate::{
     errors::{utils::MapApiError, ApiError},
@@ -15,7 +18,7 @@ use crate::{
 #[async_trait]
 pub trait FilesRepository {
     async fn create_file(&self, namespace: &str, file: FileInput) -> Result<Model, ApiError>;
-    async fn find_all_by_tag(
+    async fn find_files_by_tag(
         &self,
         namespace: &str,
         tag: &Option<String>,
@@ -59,12 +62,14 @@ impl<T: ConnectionTrait> FilesRepository for T {
         Ok(inserted_file)
     }
 
-    async fn find_all_by_tag(
+    async fn find_files_by_tag(
         &self,
         namespace: &str,
         tag: &Option<String>,
     ) -> Result<Vec<Model>, ApiError> {
-        let mut query = Entity::find().filter(Column::Namespace.eq(namespace.to_owned()));
+        let mut query = Entity::find()
+            .filter(Column::Namespace.eq(namespace.to_owned()))
+            .order_by(Column::CreatedAt, Order::Desc);
 
         if let Some(t) = tag {
             query = query.filter(Expr::cust_with_values(

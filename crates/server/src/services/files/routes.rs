@@ -70,6 +70,7 @@ pub async fn create_file(
         settings.s3().buckets().file(),
         model.storage_key()
     );
+
     Ok(UploadFileOutput {
         id: model.id,
         upload_url: Some(presigned_url),
@@ -90,7 +91,7 @@ pub async fn list_files(
 ) -> Result<FileOutputList, ApiError> {
     let files = data
         .conn()
-        .find_all_by_tag(api_key.namespace().as_str(), filter.tag())
+        .find_files_by_tag(api_key.namespace().as_str(), filter.tag())
         .await?;
 
     let s3_settings = data.settings().s3();
