@@ -50,7 +50,7 @@ impl<T: ConnectionTrait> FilesRepository for T {
             Uuid::new_v4().to_string().replace('-', ""),
             input.file().file_name()
         );
-        let file_model = entity::file::ActiveModel {
+        let file_model = ActiveModel {
             namespace: Set(namespace.to_owned()),
             storage_key: Set(storage_key),
             tags: Set(input.tags().to_owned()),
