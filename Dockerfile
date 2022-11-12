@@ -31,7 +31,7 @@ RUN cargo build --target x86_64-unknown-linux-musl --release
 ## Build CA Certificates
 ####################################################################################################
 
-FROM alpine:3.16.2 as ca-certificates
+FROM alpine:3.16.3 as ca-certificates
 RUN apk add -U --no-cache ca-certificates
 
 ####################################################################################################
