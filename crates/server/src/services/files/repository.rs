@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use sea_orm::{
     prelude::*, sea_query::Expr, ActiveModelTrait, ActiveValue::Set, ConnectionTrait, QueryOrder,
 };
-use serde_json::{Map, Value };
+use serde_json::{Map, Value};
 use uuid::Uuid;
 
 use entity::file::{ActiveModel, Column, Entity, Model};
