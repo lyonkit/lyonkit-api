@@ -15,6 +15,8 @@ lto = "fat"
 
 [profile.release.package.health-check]
 strip = "symbols"
+opt-level = "s"
+codegen-units = 1
 
 [package]
 name = "lyonkit-api"

@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use sea_orm::{
     prelude::*, sea_query::Expr, ActiveModelTrait, ActiveValue::Set, ConnectionTrait, QueryOrder,
 };
-use serde_json::{Map, Value};
+use serde_json::{Map, Value };
 use uuid::Uuid;
 
 use entity::file::{ActiveModel, Column, Entity, Model};
@@ -32,6 +32,7 @@ pub trait FilesRepository {
     async fn delete_file(&self, namespace: &str, id: &i32) -> Result<Model, ApiError>;
 }
 
+/// Converts an HashMap to a serde_json::Value
 fn string_map_to_json(map: &HashMap<String, String>) -> Value {
     let mut value = Map::new();
 
