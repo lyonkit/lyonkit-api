@@ -15,6 +15,6 @@ sea-orm-migration = { version = "0.10.3", features = ["sqlx-postgres", "runtime-
 chrono = "0.4.23"
 tracing = "0.1.37"
 tracing-subscriber = "0.3.16"
-tokio = { version = "1.21.2", features = ["macros"] }
+tokio = { version = "1.22.0", features = ["macros"] }
 openssl = { version = "0.10.42", features = ["vendored"] }
 openssl-probe = "0.1.5"
