@@ -14,7 +14,7 @@ actix-cors = { version = "0.6.4" }
 mime = { version = "0.3.16" }
 tokio = { version = "1.22.0", features = ["macros", "rt-multi-thread", "fs"] }
 tokio-util = { version = "0.7.4", features = ["codec"] }
-serde = "1.0.147"
+serde = "1.0.148"
 tracing = "0.1.37"
 tracing-actix-web = { version = "0.6.2", features = ["default", "opentelemetry_0_17"] }
 opentelemetry = { version = "0.18", features = ["rt-tokio-current-thread"] }
@@ -50,6 +50,6 @@ typed-builder = "0.11.0"
 humansize = { version = "2.1.2", features = ["impl_style"] }
 
 [dev-dependencies]
-insta = { version = "1.21.1", features = ["json"] }
+insta = { version = "1.21.2", features = ["json"] }
 portpicker = "0.1.1"
 test-context = "0.1.4"
