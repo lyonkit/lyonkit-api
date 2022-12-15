@@ -47,13 +47,7 @@ impl From<Settings> for aws_sdk_s3::Config {
                 AppName::new(cfg.app_name().clone())
                     .expect("Invalid app name given (S3 doesn't accept such app name)"),
             )
-            .endpoint_resolver(Endpoint::immutable(
-                s3_cfg
-                    .endpoint()
-                    .clone()
-                    .parse()
-                    .expect("Invalid S3 endpoint provided"),
-            ))
+            .endpoint_resolver(Endpoint::immutable(s3_cfg.endpoint()).expect("Invalid S3 endpoint"))
             .region(Region::new(s3_cfg.region().clone()))
             .credentials_provider(s3_cfg.credentials().to_sdk_credentials())
             .sleep_impl(default_async_sleep().unwrap())
