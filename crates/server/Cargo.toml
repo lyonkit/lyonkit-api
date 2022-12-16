@@ -14,7 +14,7 @@ actix-cors = { version = "0.6.4" }
 mime = { version = "0.3.16" }
 tokio = { version = "1.23.0", features = ["macros", "rt-multi-thread", "fs"] }
 tokio-util = { version = "0.7.4", features = ["codec"] }
-serde = "1.0.150"
+serde = "1.0.151"
 tracing = "0.1.37"
 tracing-actix-web = { version = "0.6.2", features = ["default", "opentelemetry_0_17"] }
 opentelemetry = { version = "0.18", features = ["rt-tokio-current-thread"] }
