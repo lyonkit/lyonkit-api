@@ -12,7 +12,7 @@ actix-web = "4.2.1"
 actix-multipart = { version = "0.4.0" }
 actix-cors = { version = "0.6.4" }
 mime = { version = "0.3.16" }
-tokio = { version = "1.23.0", features = ["macros", "rt-multi-thread", "fs"] }
+tokio = { version = "1.23.1", features = ["macros", "rt-multi-thread", "fs"] }
 tokio-util = { version = "0.7.4", features = ["codec"] }
 serde = "1.0.152"
 tracing = "0.1.37"
