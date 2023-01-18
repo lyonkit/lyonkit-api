@@ -33,7 +33,7 @@ jobs:
           --name postgres_container
 
       s3:
-        image: bitnami/minio:2022
+        image: bitnami/minio:2023
         ports:
           - "9000:9000"
         volumes:
