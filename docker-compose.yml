@@ -52,7 +52,7 @@ services:
       start_period: 80s
 
   s3:
-    image: bitnami/minio:2022
+    image: bitnami/minio:2023
     restart: unless-stopped
     ports:
       - "9000:9000"
