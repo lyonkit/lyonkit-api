@@ -141,7 +141,6 @@ pub async fn upload_image(
     while let Some(Ok(field)) = payload.next().await {
         match field.name() {
             "image" => {
-                let content_type = field.content_type().clone();
                 // ["gif", "jpeg", "ico", "png", "pnm", "tga", "tiff", "webp", "bmp", "hdr",
                 // "dxt", "dds", "farbfeld", "jpeg_rayon", "openexr"]
                 let supported_mime = vec![
@@ -151,6 +150,10 @@ pub async fn upload_image(
                     mime::IMAGE_GIF,
                     mime::IMAGE_BMP,
                 ];
+
+                let Some(content_type) = field.content_type().cloned() else {
+                    return Err(ApiError::MissingContentType(supported_mime).into());
+                };
 
                 let mut field = match supported_mime.contains(&content_type) {
                     true => Ok(field),
