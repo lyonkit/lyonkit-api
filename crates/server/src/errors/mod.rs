@@ -30,6 +30,7 @@ pub enum ApiError {
     DbDeserializeError,
     NotFound,
     ReferenceNotFound(String),
+    MissingContentType(Vec<Mime>),
     InvalidContentType(Vec<Mime>, Mime),
     MissingField(String),
     ImageNotDecodable,
@@ -57,6 +58,17 @@ impl Display for ApiError {
             ApiError::NotFound => write!(f, "Not found"),
             ApiError::ReferenceNotFound(reference) => {
                 write!(f, "Reference to \"{}\" not found", reference)
+            }
+            ApiError::MissingContentType(expected) => {
+                write!(
+                    f,
+                    "Missing content-type expected one of \"{}\"",
+                    expected
+                        .iter()
+                        .map(|v| v.to_string())
+                        .collect::<Vec<_>>()
+                        .join("\", \"")
+                )
             }
             ApiError::InvalidContentType(expected, actual) => {
                 write!(
@@ -100,6 +112,7 @@ impl ApiErrorTrait for ApiError {
             ApiError::DbDeserializeError => String::from("DBDSE"),
             ApiError::NotFound => String::from("NTFND"),
             ApiError::ReferenceNotFound(_) => String::from("REFNF"),
+            ApiError::MissingContentType(_) => String::from("MISCT"),
             ApiError::InvalidContentType(_, _) => String::from("BADCT"),
             ApiError::MissingField(_) => String::from("FLMIS"),
             ApiError::ImageNotDecodable => String::from("IMGND"),
@@ -119,6 +132,7 @@ impl ApiErrorTrait for ApiError {
             ApiError::ApiKeyReadOnly => StatusCode::UNAUTHORIZED,
             ApiError::NotFound => StatusCode::NOT_FOUND,
             ApiError::ReferenceNotFound(_)
+            | ApiError::MissingContentType(_)
             | ApiError::InvalidContentType(_, _)
             | ApiError::PatchNotNullable(_)
             | ApiError::PatchAtLeastOneField

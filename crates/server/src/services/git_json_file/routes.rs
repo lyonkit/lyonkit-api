@@ -1,5 +1,6 @@
 use super::services::fetch_git_json_file;
 use crate::{
+    utils::b64,
     errors::{utils::MapApiError, ApiError},
     middlewares::api_key::WriteApiKey,
     server::AppState,
@@ -90,7 +91,7 @@ pub async fn update_git_json_file(
 
     let updated_content = body.into_inner();
     let commit = GitCommitPayload::builder()
-        .content(base64::encode(format!("{:#}\n", &updated_content)))
+        .content(b64::encode(format!("{:#}\n", &updated_content)))
         .message(format!("chore: API update of {inner_path}"))
         .branch("main".to_string())
         .sha(content.sha().clone())
