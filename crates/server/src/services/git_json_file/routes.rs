@@ -1,10 +1,10 @@
 use super::services::fetch_git_json_file;
 use crate::{
-    utils::b64,
     errors::{utils::MapApiError, ApiError},
     middlewares::api_key::WriteApiKey,
     server::AppState,
     services::git_json_file::{models::GitCommitPayload, services::GITHUB_CLIENT},
+    utils::b64,
 };
 use actix_web::{get, put, web, Error as ActixError, HttpResponse};
 use entity::git_auth::{Column, Entity};
