@@ -33,12 +33,12 @@ uuid = { version = "1.3.0", features = ["serde"] }
 derive_more = "0.99.17"
 url = "2.3.1"
 async-trait = "0.1.64"
-once_cell = "1.17.0"
+once_cell = "1.17.1"
 aws-sdk-s3 = { version = "0.24.0", features = ["native-tls", "rt-tokio"], default-features = false }
 aws-types = { version = "0.54.1" }
 aws-config = { version = "0.54.1", features = ["native-tls", "rt-tokio"], default-features = false }
-aws-smithy-http = { version = "0.54.2", features = ["rt-tokio"] }
-aws-smithy-async = { version = "0.54.2", features = ["rt-tokio"] }
+aws-smithy-http = { version = "0.54.3", features = ["rt-tokio"] }
+aws-smithy-async = { version = "0.54.3", features = ["rt-tokio"] }
 image = { version = "0.24.5" }
 openssl = { version = "0.10.45", features = ["vendored"] }
 openssl-probe = "0.1.5"
