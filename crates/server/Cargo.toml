@@ -8,7 +8,7 @@ publish = false
 [dependencies]
 entity = { path = "../entity" }
 migration = { path = "../migration" }
-actix-web = "4.3.0"
+actix-web = "4.3.1"
 actix-multipart = { version = "0.5.0" }
 actix-cors = { version = "0.6.4" }
 mime = { version = "0.3.16" }
