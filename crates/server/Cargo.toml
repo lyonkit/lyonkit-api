@@ -27,7 +27,7 @@ sea-orm = { version = "0.11.1", features = ["debug-print", "runtime-tokio-native
 config = { version = "0.13.3" }
 serde_json = "1.0.94"
 chrono = "0.4.23"
-futures = "0.3.26"
+futures = "0.3.27"
 getset = "0.1.2"
 uuid = { version = "1.3.0", features = ["serde"] }
 derive_more = "0.99.17"
